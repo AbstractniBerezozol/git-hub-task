@@ -9,7 +9,7 @@ export class UsersService {
       nickname: 'Lev',
       email: 'At@at',
       password: 'tritata',
-      gitRepsList: ['tri', 'cetire'],
+      gitRepsList: ['tri', 'cetire', 'pet'],
     },
   ];
 
