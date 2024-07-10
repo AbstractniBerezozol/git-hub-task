@@ -1,7 +1,6 @@
 export class CreateUserDto {
-    nickname: string;
+    username: string;
     password: string;
     id: number;
     email: string;
-    wishList: [];
 }
