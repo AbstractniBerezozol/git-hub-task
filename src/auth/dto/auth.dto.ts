@@ -1,4 +1,12 @@
+import { IsNotEmpty, IsString, Length } from '@nestjs/class-validator';
+
 export class AuthPayloadDto {
-    username: string;
-    password: string;
+  @IsNotEmpty()
+  @IsString()
+  username: string;
+  @IsNotEmpty()
+  @IsString()
+  @Length(7,50)
+  password: string;
+  
 }
