@@ -30,6 +30,7 @@ export class UsersService {
     const email = createUserDto.email;
     const newUser = this.userRepository.create({username, email, password: hashedPassword });
     return this.userRepository.save(newUser);
+    
   }
   async update(id: number, updateUserDto: UpdateUserDto) {
     const user = await this.userRepository.preload({
