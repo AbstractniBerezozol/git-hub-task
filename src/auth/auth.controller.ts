@@ -21,6 +21,7 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
+
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(@Body() data: AuthPayloadDto) {
@@ -31,4 +32,9 @@ export class AuthController {
   async register(@Body() data: CreateUserDto) {
     return this.authService.register(data);
   }
+// @UseGuards(LocalAuthGuard)
+//   @Get('profile')
+//   getProfile(@Request() req) {
+//     return req.user;
+//   }
 }

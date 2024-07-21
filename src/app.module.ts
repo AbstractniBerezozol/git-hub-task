@@ -7,26 +7,43 @@ import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GithubIneractionService } from './github-ineraction/github-ineraction.service';
 import { GithubInteractionController } from './github-ineraction/github-interaction.controller';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { HttpModule } from '@nestjs/axios';
 import { GitRepository } from './github-ineraction/github-interaction/repository/repository.entity';
+import { JwtModule } from '@nestjs/jwt';
+import { EmailService } from './email/email-service/email.service';
 
 @Module({
   imports: [
-    UsersModule,AuthModule,
+    UsersModule,
     AuthModule,
-    TypeOrmModule.forRoot({
-      type: 'postgres', // type of our database
-      host: 'localhost', // database host
-      port: 5432, // database host
-      username: 'postgres', // username
-      password: 'pass123', // user password
-      database: 'postgres', // name of our database,
-      autoLoadEntities: true, // models will be loaded automatically
-      synchronize: true,
-    }), ConfigModule.forRoot({isGlobal: true,}), HttpModule, TypeOrmModule.forFeature([GitRepository])
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get<string>('DB_HOST'),
+        port: configService.get<number>('DB_PORT'),
+        username: configService.get<string>('DB_USERNAME'),
+        password: configService.get<string>('DB_PASSWORD'), 
+        database: configService.get<string>('DB_NAME'), 
+        autoLoadEntities: true, 
+        synchronize: true,
+      }),
+      inject: [ConfigService]
+    }),
+    ConfigModule.forRoot({ isGlobal: true }),
+    HttpModule,
+    TypeOrmModule.forFeature([GitRepository]),
+    // JwtModule.registerAsync({
+    //   imports: [ConfigModule],
+    //   useFactory: async (configService: ConfigService) => ({
+    //     secret: configService.get<string>('JWT_SECRET'),
+    //     signOptions: { expiresIn: '1h' },
+    //   }),
+    //   inject: [ConfigService],
+    // }),
   ],
   controllers: [AppController, GithubInteractionController],
-  providers: [AppService, GithubIneractionService],
+  providers: [AppService, GithubIneractionService, EmailService],
 })
 export class AppModule {}
