@@ -7,7 +7,7 @@ import { CreateUserDto } from 'src/users/dto/create-user.dto';
 
 describe('AuthService', () => {
   let authService: AuthService;
-  let
+
 
   const mockAuthService = {
     login: jest.fn(),
@@ -64,7 +64,7 @@ describe('AuthService', () => {
       repositories: [],
     } as User;
 
-    jest.spyOn(authService, 'register').mockReturnValue(user);
+    jest.spyOn(authService, 'register').mockResolvedValue(user);
 
     const result = await authService.register(createUserDto);
 

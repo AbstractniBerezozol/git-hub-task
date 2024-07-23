@@ -12,9 +12,11 @@ import { HttpModule } from '@nestjs/axios';
 import { GitRepository } from './github-ineraction/github-interaction/repository/repository.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { EmailService } from './email/email-service/email.service';
+import { GithubInteractionModule } from './github-ineraction/github-interaction.module';
 
 @Module({
   imports: [
+    GithubInteractionModule,
     UsersModule,
     AuthModule,
     TypeOrmModule.forRootAsync({
@@ -33,7 +35,7 @@ import { EmailService } from './email/email-service/email.service';
     }),
     ConfigModule.forRoot({ isGlobal: true }),
     HttpModule,
-    TypeOrmModule.forFeature([GitRepository]),
+    
     // JwtModule.registerAsync({
     //   imports: [ConfigModule],
     //   useFactory: async (configService: ConfigService) => ({
@@ -43,7 +45,7 @@ import { EmailService } from './email/email-service/email.service';
     //   inject: [ConfigService],
     // }),
   ],
-  controllers: [AppController, GithubInteractionController],
-  providers: [AppService, GithubIneractionService, EmailService],
+  controllers: [AppController,],
+  providers: [AppService,],
 })
 export class AppModule {}

@@ -1,5 +1,5 @@
 import { User } from 'src/users/entities/user.entity';
-import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class GitRepository {
@@ -33,6 +33,6 @@ export class GitRepository {
     @Column()
     forks_count: number;
 
-    @ManyToMany(() => User, user => user.repositories)
+    @ManyToOne(() => User, user => user.repositories)
     user: User;
 }

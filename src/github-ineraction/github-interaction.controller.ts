@@ -6,6 +6,8 @@ import {
   UseGuards,
   Request,
   Post,
+  Delete,
+  Body,
 } from '@nestjs/common';
 import { GithubIneractionService } from './github-ineraction.service';
 import { query } from 'express';
@@ -19,19 +21,25 @@ import { SearchBy } from './github-interaction/repository/repository.enum';
 export class GithubInteractionController {
   constructor(private readonly githubService: GithubIneractionService) {}
 
-  @Get('search/repositories/:name')
-  async searchRepositories(@Param('name') name: string, searchBy: SearchBy) {
-    return this.githubService.searchRepositories(name, searchBy);
+  @Get('search/repositories/:value')
+  async searchRepositories(@Param('value') value: string, searchBy: SearchBy) {
+    return this.githubService.searchRepositories(value, searchBy);
   }
 
-  @Post('repos/')
-  async addToWatchlist(
-    @Request()
-    req,
-  ): Promise<GitRepository> {
-    return this.githubService.addRepository(req.user);
+  @Post('add-repository/:repoId')
+  async addRepositoryToWatchlist(@Param('repoId') repoId: number, @Body('username') username: string) {
+    const user = await this.githubService.getUser(username);
+    return this.githubService.addRepository(repoId, user);
   }
 
+  @Delete('delete-repository')
+  async deleteRepository(
+    @Param('repoId') repoId: number,
+    @Body('username') username: string,
+  ) {
+    const user = await this.githubService.getUser(username);
+    return this.githubService.deleteRepository(repoId, user);
+  }
   @Get('watchlist')
   async getWatchlist(@Request() req): Promise<GitRepository[]> {
     return this.githubService.getWatchlist(req.user);

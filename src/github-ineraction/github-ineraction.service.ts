@@ -16,10 +16,18 @@ export class GithubIneractionService {
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
+    @InjectRepository(User)
+    private readonly userRep: Repository<User>,
     @InjectRepository(GitRepository)
     private readonly gitRepository: Repository<GitRepository>,
   ) {}
 
+  async getUser(username: string): Promise<User> {
+    return this.userRep.findOne({
+      where: { username },
+      relations: ['repositories'],
+    });
+  }
   async searchRepositories(name: string, searchBy: SearchBy): Promise<any> {
     const token = this.configService.get<string>('GITHUB_TOKEN');
     const headers = {
@@ -27,18 +35,19 @@ export class GithubIneractionService {
     };
 
     try {
-      const response = await firstValueFrom(
-        this.httpService.get(`${this.githubApiUrl}/search/repositories`, {
+      const result = await firstValueFrom(
+        this.httpService.get(`${this.githubApiUrl}/search/repositories/{}`, {
           headers,
           params: { q: `${name} ,${searchBy}` },
         }),
       );
+      return result.data;
     } catch (error) {
       throw new HttpException(error.response.data, error.response.status);
     }
   }
 
-  async addRepository(user: User): Promise<GitRepository> {
+  async addRepository(repoId: number, user: User): Promise<GitRepository> {
     const token = this.configService.get<string>('GITHUB_TOKEN');
     const headers = {
       Authorization: `token ${token}`,
@@ -46,10 +55,9 @@ export class GithubIneractionService {
 
     try {
       const response = await firstValueFrom(
-        this.httpService.get(
-          `${this.githubApiUrl}/repositories/${user.username}`,
-          { headers },
-        ),
+        this.httpService.get(`${this.githubApiUrl}/repositories/${repoId}`, {
+          headers,
+        }),
       );
       const repo = response.data;
       const newRepo = this.gitRepository.create({
@@ -68,6 +76,16 @@ export class GithubIneractionService {
     } catch (error) {
       throw new HttpException(error.response.data, error.response.status);
     }
+  }
+
+  async deleteRepository(repoId: number, user: User): Promise<void> {
+    const repository = await this.gitRepository.findOne({
+      where: { user, repoId },
+    });
+    if (!repository) {
+      throw new HttpException('not found', 404);
+    }
+    await this.gitRepository.remove(repository);
   }
 
   async getWatchlist(user: User): Promise<GitRepository[]> {

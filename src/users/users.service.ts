@@ -22,6 +22,7 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException(`User #${username} not found`);
     }
+    delete user.password;
     return user;
   }
   async create(createUserDto: CreateUserDto) {
