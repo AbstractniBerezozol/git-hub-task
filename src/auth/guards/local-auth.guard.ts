@@ -38,7 +38,7 @@ export class LocalAuthGuard implements CanActivate {
       request['user'] = payload;
     } catch {
       console.log('Here')
-      // throw new UnauthorizedException();
+      throw new UnauthorizedException();
     }
     return true;
   }

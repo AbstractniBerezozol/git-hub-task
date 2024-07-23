@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { GitRepository } from './github-interaction/repository/repository.entity';
 import { User } from 'src/users/entities/user.entity';
+import { SearchBy } from './github-interaction/repository/repository.enum';
 
 @Injectable()
 export class GithubIneractionService {
@@ -18,44 +19,8 @@ export class GithubIneractionService {
     @InjectRepository(GitRepository)
     private readonly gitRepository: Repository<GitRepository>,
   ) {}
-  async getUser(username: string): Promise<any> {
-    const token = this.configService.get<string>('GITHUB_TOKEN');
-    const headers = {
-      Authorization: `token ${token}`,
-    };
 
-    try {
-      const response = await firstValueFrom(
-        this.httpService.get(`${this.githubApiUrl}/users/${username}`, {
-          headers,
-        }),
-      );
-      return response.data;
-    } catch (error) {
-      throw new HttpException(error.response.data, error.response.status);
-    }
-  }
-
-  async searchUsers(query: string): Promise<any> {
-    const token = this.configService.get<string>('GITHUB_TOKEN');
-    const headers = {
-      Authorization: `token ${token}`,
-    };
-
-    try {
-      const response = await firstValueFrom(
-        this.httpService.get(`${this.githubApiUrl}/search/users`, {
-          headers,
-          params: { q: query },
-        }),
-      );
-      return response.data.items;
-    } catch (error) {
-      throw new HttpException(error.response.data, error.response.status);
-    }
-  }
-
-  async searchRepositories(query: string): Promise<any> {
+  async searchRepositories(name: string, searchBy: SearchBy): Promise<any> {
     const token = this.configService.get<string>('GITHUB_TOKEN');
     const headers = {
       Authorization: `token ${token}`,
@@ -65,7 +30,7 @@ export class GithubIneractionService {
       const response = await firstValueFrom(
         this.httpService.get(`${this.githubApiUrl}/search/repositories`, {
           headers,
-          params: { q: query },
+          params: { q: `${name} ,${searchBy}` },
         }),
       );
     } catch (error) {
@@ -97,7 +62,7 @@ export class GithubIneractionService {
         stargazers_count: repo.stargazers_count,
         watchers_count: repo.watchers_count,
         forks_count: repo.forks_count,
-        user
+        user,
       });
       return this.gitRepository.save(newRepo);
     } catch (error) {
@@ -108,4 +73,40 @@ export class GithubIneractionService {
   async getWatchlist(user: User): Promise<GitRepository[]> {
     return this.gitRepository.find({ where: { user: user } });
   }
+  // async getUser(username: string): Promise<any> {
+  //   const token = this.configService.get<string>('GITHUB_TOKEN');
+  //   const headers = {
+  //     Authorization: `token ${token}`,
+  //   };
+
+  //   try {
+  //     const response = await firstValueFrom(
+  //       this.httpService.get(`${this.githubApiUrl}/users/${username}`, {
+  //         headers,
+  //       }),
+  //     );
+  //     return response.data;
+  //   } catch (error) {
+  //     throw new HttpException(error.response.data, error.response.status);
+  //   }
+  // }
+
+  // async searchUsers(query: string): Promise<any> {
+  //   const token = this.configService.get<string>('GITHUB_TOKEN');
+  //   const headers = {
+  //     Authorization: `token ${token}`,
+  //   };
+
+  //   try {
+  //     const response = await firstValueFrom(
+  //       this.httpService.get(`${this.githubApiUrl}/search/users`, {
+  //         headers,
+  //         params: { q: query },
+  //       }),
+  //     );
+  //     return response.data.items;
+  //   } catch (error) {
+  //     throw new HttpException(error.response.data, error.response.status);
+  //   }
+  // }
 }

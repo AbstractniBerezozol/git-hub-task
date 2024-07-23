@@ -17,12 +17,13 @@ import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { UsersService } from 'src/users/users.service';
 import { ApiBody } from '@nestjs/swagger';
 import { LocalAuthGuard } from './guards/local-auth.guard';
+import { User } from 'src/users/entities/user.entity';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @UseGuards(LocalAuthGuard)
+ 
   @Post('login')
   async login(@Body() data: AuthPayloadDto) {
     return this.authService.login(data);
@@ -32,9 +33,9 @@ export class AuthController {
   async register(@Body() data: CreateUserDto) {
     return this.authService.register(data);
   }
-// @UseGuards(LocalAuthGuard)
-//   @Get('profile')
-//   getProfile(@Request() req) {
-//     return req.user;
-//   }
+
+  @Get('profile')
+  getProfile(@Request() req ) {
+    return req.user;
+  }
 }

@@ -1,4 +1,4 @@
-import { IsEmail, IsString } from "@nestjs/class-validator";
+import { IsEmail, IsOptional, IsString } from "@nestjs/class-validator";
 
 
 export class CreateUserDto {
@@ -8,4 +8,5 @@ export class CreateUserDto {
     password: string;
     @IsEmail()
     email: string;
+    
 }
