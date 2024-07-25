@@ -2,8 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtService } from '@nestjs/jwt';
-import { UsersService } from 'src/users/users.service';
-import { User } from 'src/users/entities/user.entity';
+import { UsersService } from '../users/users.service';
+import { User } from '../users/entities/user.entity';
 import { ServerCapabilities } from 'typeorm';
 import { AuthPayloadDto } from './dto/auth.dto';
 

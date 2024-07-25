@@ -21,13 +21,22 @@ import { SearchBy } from './github-interaction/repository/repository.enum';
 export class GithubInteractionController {
   constructor(private readonly githubService: GithubIneractionService) {}
 
-  @Get('search/repositories/:value')
-  async searchRepositories(@Param('value') value: string, searchBy: SearchBy) {
-    return this.githubService.searchRepositories(value, searchBy);
+  @Get('search/repos/:value')
+  async searchRepositories(
+    @Query('searchBy') searchBy: SearchBy,
+    @Param('value') value: string,
+  ) {
+    console.log(value);
+    console.log(searchBy);
+    return this.githubService.searchRepositories( searchBy, value);
   }
 
   @Post('add-repository/:repoId')
-  async addRepositoryToWatchlist(@Param('repoId') repoId: number, @Body('username') username: string) {
+  async addRepositoryToWatchlist(
+    @Param('repoId') repoId: number,
+    @Body('username') username: string,
+  ) {
+    console.log('Here')
     const user = await this.githubService.getUser(username);
     return this.githubService.addRepository(repoId, user);
   }

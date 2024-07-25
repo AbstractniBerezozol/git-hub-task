@@ -1,8 +1,13 @@
-import { User } from 'src/users/entities/user.entity';
+
+
 import { Column, Entity, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { User } from '../../../users/entities/user.entity';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
+
 export class GitRepository {
+    @ApiProperty()
     @PrimaryGeneratedColumn()
     id: number;
 

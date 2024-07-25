@@ -1,4 +1,6 @@
+import { ApiProperty } from "@nestjs/swagger";
 export enum SearchBy {
+
   name = 'in:name',
   description = 'in:description',
   topics ='in:topics',

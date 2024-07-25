@@ -28,7 +28,7 @@ export class GithubIneractionService {
       relations: ['repositories'],
     });
   }
-  async searchRepositories(name: string, searchBy: SearchBy): Promise<any> {
+  async searchRepositories(searchBy: SearchBy, name: string): Promise<any> {
     const token = this.configService.get<string>('GITHUB_TOKEN');
     const headers = {
       Authorization: `token ${token}`,
@@ -36,13 +36,15 @@ export class GithubIneractionService {
 
     try {
       const result = await firstValueFrom(
-        this.httpService.get(`${this.githubApiUrl}/search/repositories/{}`, {
+        this.httpService.get(`${this.githubApiUrl}/search/repositories`, {
           headers,
-          params: { q: `${name} ,${searchBy}` },
+          params: { q: `${name} ${searchBy}` },
         }),
       );
+
       return result.data;
     } catch (error) {
+      console.log('I am here');
       throw new HttpException(error.response.data, error.response.status);
     }
   }

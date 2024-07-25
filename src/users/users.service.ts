@@ -4,7 +4,7 @@ import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import * as bcrypt from 'bcryptjs'
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class UsersService {
@@ -13,8 +13,12 @@ export class UsersService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  findAll() {
-    return this.userRepository.find();
+  async findAll() {
+    const users = await this.userRepository.find();
+    for (const user of users) {
+      delete user.password;
+    }
+    return users;
   }
 
   async findOne(username: string) {
@@ -22,16 +26,20 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException(`User #${username} not found`);
     }
-    delete user.password;
+    // const userWithNoPass = user;
+    // delete userWithNoPass.password;
     return user;
   }
   async create(createUserDto: CreateUserDto) {
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
     const username = createUserDto.username;
     const email = createUserDto.email;
-    const newUser = this.userRepository.create({username, email, password: hashedPassword });
+    const newUser = this.userRepository.create({
+      username,
+      email,
+      password: hashedPassword,
+    });
     return this.userRepository.save(newUser);
-    
   }
   async update(username: string, updateUserDto: UpdateUserDto) {
     const user = await this.userRepository.preload({

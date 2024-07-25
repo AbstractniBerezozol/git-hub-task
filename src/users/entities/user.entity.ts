@@ -1,8 +1,12 @@
-import { GitRepository } from 'src/github-ineraction/github-interaction/repository/repository.entity';
+
+
+import { ApiProperty } from '@nestjs/swagger';
+import { GitRepository } from '../../github-ineraction/github-interaction/repository/repository.entity'
 import { Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn, Repository } from 'typeorm';
 
 @Entity()
 export class User {
+  @ApiProperty()
   @PrimaryGeneratedColumn()
   id: number;
   @Column()

@@ -1,54 +1,60 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
-import { User } from 'src/users/entities/user.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { AuthPayloadDto } from './dto/auth.dto';
-import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import { UsersService } from '../users/users.service';
+import { User } from '../users/entities/user.entity';
+import { CreateUserDto } from '../users/dto/create-user.dto';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcryptjs'
 
 describe('AuthService', () => {
   let authService: AuthService;
-
+  let usersService: UsersService;
+  let jwtService: JwtService;
 
   const mockAuthService = {
     login: jest.fn(),
-    register: jest.fn(),
+    create: jest.fn(),
   };
+
+  const mockUserService = {
+    findOne: jest.fn()
+  }
+  const mockJwtService = {
+    sign: jest.fn().mockReturnValue('mockAccessToken')
+  }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
-        { provide: getRepositoryToken(User), useValue: mockAuthService },
+        { provide: UsersService, useValue: usersService },
       ],
     }).compile();
 
     authService = module.get<AuthService>(AuthService);
+    usersService = module.get<UsersService>(UsersService);
+    jwtService = module.get<JwtService>(JwtService);
   });
 
   it('should be defined', () => {
     expect(authService).toBeDefined();
   });
   it('login => should return jwt token for logging', async () => {
-    const authPayloadDto = {
-      username: 'Coco',
-      password: 'Coco123',
-    } as AuthPayloadDto;
-
     const user = {
       id: 1,
       username: 'Coco',
       password: 'Coco123',
       repositories: [],
     } as User;
+    mockUserService.findOne.mockResolvedValue(user);
+    jest.spyOn(bcrypt, 'compare').mockResolvedValueOnce(true)
 
-    jest.spyOn(mockAuthService, 'login').mockReturnValue(user);
-
-    const result = await authService.login(authPayloadDto);
-
-    expect(result).toEqual(user);
-
-    expect(mockAuthService.login).toBeCalled();
-    expect(mockAuthService.login).toBeCalledWith(authPayloadDto);
+    const result = await authService.login( {username: 'Coco',
+      password: 'Coco123'});
+      expect(result).toHaveProperty('access_token');
+      expect(jwtService.sign).toHaveBeenCalledWith({username: 'Coco'})
   });
   it('register => should creates new user', async () => {
     const createUserDto = {
@@ -64,12 +70,12 @@ describe('AuthService', () => {
       repositories: [],
     } as User;
 
-    jest.spyOn(authService, 'register').mockResolvedValue(user);
+    jest.spyOn(usersService, 'create').mockResolvedValue(user);
 
-    const result = await authService.register(createUserDto);
+    const result = await usersService.create(createUserDto);
 
-    expect(mockAuthService.register).toBeCalled();
-    expect(mockAuthService.register).toBeCalledWith(createUserDto);
+    expect(mockAuthService.create).toBeCalled();
+    expect(mockAuthService.create).toBeCalledWith(createUserDto);
 
     expect(result).toEqual(user);
   });

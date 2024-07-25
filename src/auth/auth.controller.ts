@@ -15,9 +15,12 @@ import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt.guard';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { UsersService } from 'src/users/users.service';
-import { ApiBody } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { User } from 'src/users/entities/user.entity';
+
+@ApiBearerAuth()
+@ApiTags()
 
 @Controller('auth')
 export class AuthController {
