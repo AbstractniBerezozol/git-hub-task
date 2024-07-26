@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { GitRepository } from './github-interaction/repository/repository.entity';
 import { User } from 'src/users/entities/user.entity';
 import { SearchBy } from './github-interaction/repository/repository.enum';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class GithubIneractionService {

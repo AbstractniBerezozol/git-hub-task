@@ -39,5 +39,5 @@ export class GitRepository {
     forks_count: number;
 
     @ManyToOne(() => User, user => user.repositories)
-    user: User;
+    user!: User;
 }

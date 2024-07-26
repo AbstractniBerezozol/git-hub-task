@@ -26,9 +26,17 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException(`User #${username} not found`);
     }
-    // const userWithNoPass = user;
-    // delete userWithNoPass.password;
+    console.log(user.repositories);
     return user;
+  }
+
+  
+
+  async userWithNoPassword(username: string) {
+    const user = this.findOne(username);
+    delete (await user).password;
+    return user;
+
   }
   async create(createUserDto: CreateUserDto) {
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);

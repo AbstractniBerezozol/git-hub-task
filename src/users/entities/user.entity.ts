@@ -16,5 +16,5 @@ export class User {
   @Column()
   email: string;
   @OneToMany(() => GitRepository, repository => repository.user)
-  repositories: GitRepository[];
+  repositories!: GitRepository[];
 }

@@ -15,8 +15,10 @@ import { Repository } from 'typeorm';
 import { GitRepository } from './github-interaction/repository/repository.entity';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { SearchBy } from './github-interaction/repository/repository.enum';
+import { ApiTags } from '@nestjs/swagger';
 
 @UseGuards(JwtAuthGuard)
+@ApiTags('github-interaction')
 @Controller('github-interaction')
 export class GithubInteractionController {
   constructor(private readonly githubService: GithubIneractionService) {}
