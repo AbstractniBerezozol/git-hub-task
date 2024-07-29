@@ -30,13 +30,10 @@ export class UsersService {
     return user;
   }
 
-  
-
   async userWithNoPassword(username: string) {
     const user = this.findOne(username);
     delete (await user).password;
     return user;
-
   }
   async create(createUserDto: CreateUserDto) {
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);

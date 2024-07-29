@@ -15,6 +15,6 @@ export class User {
   password: string;
   @Column()
   email: string;
-  @OneToMany(() => GitRepository, repository => repository.user)
+  @OneToMany(() => GitRepository, repository => repository.user,)
   repositories!: GitRepository[];
 }

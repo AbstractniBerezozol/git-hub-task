@@ -30,7 +30,7 @@ export class GithubInteractionController {
   ) {
     console.log(value);
     console.log(searchBy);
-    return this.githubService.searchRepositories( searchBy, value);
+    return this.githubService.searchRepositories(searchBy, value);
   }
 
   @Post('add-repository/:repoId')
@@ -38,18 +38,18 @@ export class GithubInteractionController {
     @Param('repoId') repoId: number,
     @Body('username') username: string,
   ) {
-    console.log('Here')
+    console.log('Here');
     const user = await this.githubService.getUser(username);
     return this.githubService.addRepository(repoId, user);
   }
 
-  @Delete('delete-repository')
+  @Delete('delete-repository/:repoId')
   async deleteRepository(
     @Param('repoId') repoId: number,
     @Body('username') username: string,
   ) {
     const user = await this.githubService.getUser(username);
-    return this.githubService.deleteRepository(repoId, user);
+    return this.githubService.deleteRepository(repoId);
   }
   @Get('watchlist')
   async getWatchlist(@Request() req): Promise<GitRepository[]> {

@@ -23,10 +23,10 @@ describe('AuthService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        AuthService,
-
+        
         { provide: UsersService, useValue: mockUserService },
         { provide: JwtService, useValue: mockJwtService },
+        AuthService
         ,
       ],
     }).compile();

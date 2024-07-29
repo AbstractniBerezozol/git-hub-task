@@ -13,6 +13,10 @@ import { GitRepository } from './github-ineraction/github-interaction/repository
 import { JwtModule } from '@nestjs/jwt';
 import { EmailService } from './email/email-service/email.service';
 import { GithubInteractionModule } from './github-ineraction/github-interaction.module';
+import { EmailModule } from './email/email/email.module';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { join } from 'path';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -26,26 +30,33 @@ import { GithubInteractionModule } from './github-ineraction/github-interaction.
         host: configService.get<string>('DB_HOST'),
         port: configService.get<number>('DB_PORT'),
         username: configService.get<string>('DB_USERNAME'),
-        password: configService.get<string>('DB_PASSWORD'), 
-        database: configService.get<string>('DB_NAME'), 
-        autoLoadEntities: true, 
+        password: configService.get<string>('DB_PASSWORD'),
+        database: configService.get<string>('DB_NAME'),
+        autoLoadEntities: true,
         synchronize: true,
       }),
-      inject: [ConfigService]
+      inject: [ConfigService],
     }),
     ConfigModule.forRoot({ isGlobal: true }),
     HttpModule,
-    
-    // JwtModule.registerAsync({
-    //   imports: [ConfigModule],
-    //   useFactory: async (configService: ConfigService) => ({
-    //     secret: configService.get<string>('JWT_SECRET'),
-    //     signOptions: { expiresIn: '1h' },
-    //   }),
-    //   inject: [ConfigService],
+    // EmailModule,
+    // ScheduleModule.forRoot(),
+    // MailerModule.forRoot({
+    //   transport: {
+    //     service: 'gmail',
+    //     auth: {
+    //       user: '',
+    //       pass: '',
+    //     },
+    //   },
+    //   defaults: {
+    //     from: '',
+    //   },
     // }),
+
+    
   ],
-  controllers: [AppController,],
-  providers: [AppService,],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}

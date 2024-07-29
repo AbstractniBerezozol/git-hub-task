@@ -9,12 +9,14 @@ import { GitRepository } from './github-interaction/repository/repository.entity
 import { User } from 'src/users/entities/user.entity';
 import { SearchBy } from './github-interaction/repository/repository.enum';
 import { UsersService } from '../users/users.service';
+import { EmailService } from '../email/email-service/email.service';
 
 @Injectable()
 export class GithubIneractionService {
   private readonly githubApiUrl = 'https://api.github.com';
 
   constructor(
+    // private readonly emailService: EmailService,
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
     @InjectRepository(User)
@@ -29,6 +31,55 @@ export class GithubIneractionService {
       relations: ['repositories'],
     });
   }
+
+  // async userWithNoPassword(username: string) {
+  //   const user = this.getUser(username);
+  //   (await user).password = '123';
+  //   return user;
+  // }
+
+  // async searchRepositories(searchBy: SearchBy, name: string): Promise<any> {
+  //   let query: string;
+
+  //   switch (searchBy) {
+  //     case SearchBy.name:
+  //       console.log(searchBy);
+  //       query = `in:name:${name}`;
+  //       break;
+  //   }
+  //   switch (searchBy) {
+  //     case SearchBy.description:
+  //       query = `in:description:${name}`;
+  //       break;
+  //   }
+  //   switch (searchBy) {
+  //     case SearchBy.topics:
+  //       query = `in:topics:${name}`;
+  //       break;
+  //   }
+  //   switch (searchBy) {
+  //     case SearchBy.readme:
+  //       query = `in:readme:${name}`;
+  //       break;
+  //   }
+  //   switch (searchBy) {
+  //     case SearchBy.repoOwner:
+  //       query = `repo:owner/name:${name}`;
+  //       break;
+
+  //     default:
+  //       throw new HttpException('No case', 400);
+  //   }
+  //   const url = `${this.githubApiUrl}/search/repositories?q=${query}`;
+  //   try {
+  //     const response = await this.httpService.get(url).toPromise();
+  //     return response.data.items;
+  //   } catch (error) {
+  //     console.error('error searching reps', error);
+  //     throw new HttpException('Error searching', 500);
+  //   }
+  // }
+
   async searchRepositories(searchBy: SearchBy, name: string): Promise<any> {
     const token = this.configService.get<string>('GITHUB_TOKEN');
     const headers = {
@@ -45,7 +96,6 @@ export class GithubIneractionService {
 
       return result.data;
     } catch (error) {
-      console.log('I am here');
       throw new HttpException(error.response.data, error.response.status);
     }
   }
@@ -62,6 +112,9 @@ export class GithubIneractionService {
           headers,
         }),
       );
+
+      // const userNoPass = this.userWithNoPassword(user.username)
+
       const repo = response.data;
       const newRepo = this.gitRepository.create({
         repoId: repo.id,
@@ -75,15 +128,17 @@ export class GithubIneractionService {
         forks_count: repo.forks_count,
         user,
       });
+
+      console.log(newRepo.user);
       return this.gitRepository.save(newRepo);
     } catch (error) {
       throw new HttpException(error.response.data, error.response.status);
     }
   }
 
-  async deleteRepository(repoId: number, user: User): Promise<void> {
+  async deleteRepository(repoId: number): Promise<void> {
     const repository = await this.gitRepository.findOne({
-      where: { user, repoId },
+      where: { repoId: repoId },
     });
     if (!repository) {
       throw new HttpException('not found', 404);
@@ -94,40 +149,43 @@ export class GithubIneractionService {
   async getWatchlist(user: User): Promise<GitRepository[]> {
     return this.gitRepository.find({ where: { user: user } });
   }
-  // async getUser(username: string): Promise<any> {
-  //   const token = this.configService.get<string>('GITHUB_TOKEN');
-  //   const headers = {
-  //     Authorization: `token ${token}`,
-  //   };
 
-  //   try {
-  //     const response = await firstValueFrom(
-  //       this.httpService.get(`${this.githubApiUrl}/users/${username}`, {
-  //         headers,
-  //       }),
-  //     );
-  //     return response.data;
-  //   } catch (error) {
-  //     throw new HttpException(error.response.data, error.response.status);
+  // async checkForUpdates() {
+  //   const repositories = await this.gitRepository.find({ relations: ['user'] });
+  //   for (const repo of repositories) {
+  //     try {
+  //       const url = `${this.githubApiUrl}/repositories/${repo.repoId}`;
+  //       const response = await this.httpService.get(url).toPromise();
+  //       const currentRepo = response.data;
+
+  //       if (
+  //         currentRepo.stargazers_count !== repo.stargazers_count ||
+  //         currentRepo.watchers_count !== repo.watchers_count ||
+  //         currentRepo.forks_count !== repo.forks_count
+  //       ) {
+  //       //   const updateDetails = `Stargazers: ${currentRepo.stargazers_count},
+  //       //  Watchers: ${currentRepo.watchers_count}, Forks: ${currentRepo.forks_count}`;
+  //         await this.emailService.sendNotification(repo.user.email, repo.name);
+
+  //         repo.stargazers_count = currentRepo.stargazers_count;
+  //         repo.watchers_count = currentRepo.watchers_count;
+  //         repo.forks_count = currentRepo.forks_count;
+
+  //         await this.gitRepository.save(repo);
+  //       }
+  //     } catch (error) {
+  //       console.error('Failed to check the updates for repository', error);
+  //     }
   //   }
   // }
 
-  // async searchUsers(query: string): Promise<any> {
-  //   const token = this.configService.get<string>('GITHUB_TOKEN');
-  //   const headers = {
-  //     Authorization: `token ${token}`,
-  //   };
-
-  //   try {
-  //     const response = await firstValueFrom(
-  //       this.httpService.get(`${this.githubApiUrl}/search/users`, {
-  //         headers,
-  //         params: { q: query },
-  //       }),
-  //     );
-  //     return response.data.items;
-  //   } catch (error) {
-  //     throw new HttpException(error.response.data, error.response.status);
+  // async sendMonthSummary() {
+  //   const users = await this.userRep.find({ relations: ['repositories'] });
+  //   for (const user of users) {
+  //     const summary = user.repositories
+  //       .map((repo) => `- ${repo.name} `)
+  //       .join('\n');
+  //     await this.emailService.sendMounthSummary(user.email, summary);
   //   }
   // }
 }

@@ -5,9 +5,10 @@ import { HttpModule, HttpService } from '@nestjs/axios';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GitRepository } from './github-interaction/repository/repository.entity';
 import { User } from 'src/users/entities/user.entity';
+import { EmailModule } from '../email/email/email.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, GitRepository]), HttpModule],
+  imports: [TypeOrmModule.forFeature([User, GitRepository]), HttpModule,],
   controllers: [GithubInteractionController],
   providers: [GithubIneractionService],
 })
