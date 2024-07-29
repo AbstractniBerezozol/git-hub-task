@@ -10,7 +10,7 @@ export class EmailService {
 
   async sendNotification(userEmail: string, repoName: string) {
     const subject = 'Here is update from your list!';
-    const text = 'Hello, it is update from your Watchlist!!!';
+    const text = `Hello, it is update ${repoName} from your Watchlist!!!`;
     await this.mailerService.sendMail({
       to: userEmail,
       subject: subject,

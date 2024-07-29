@@ -38,69 +38,66 @@ export class GithubIneractionService {
   //   return user;
   // }
 
-  // async searchRepositories(searchBy: SearchBy, name: string): Promise<any> {
-  //   let query: string;
-
-  //   switch (searchBy) {
-  //     case SearchBy.name:
-  //       console.log(searchBy);
-  //       query = `in:name:${name}`;
-  //       break;
-  //   }
-  //   switch (searchBy) {
-  //     case SearchBy.description:
-  //       query = `in:description:${name}`;
-  //       break;
-  //   }
-  //   switch (searchBy) {
-  //     case SearchBy.topics:
-  //       query = `in:topics:${name}`;
-  //       break;
-  //   }
-  //   switch (searchBy) {
-  //     case SearchBy.readme:
-  //       query = `in:readme:${name}`;
-  //       break;
-  //   }
-  //   switch (searchBy) {
-  //     case SearchBy.repoOwner:
-  //       query = `repo:owner/name:${name}`;
-  //       break;
-
-  //     default:
-  //       throw new HttpException('No case', 400);
-  //   }
-  //   const url = `${this.githubApiUrl}/search/repositories?q=${query}`;
-  //   try {
-  //     const response = await this.httpService.get(url).toPromise();
-  //     return response.data.items;
-  //   } catch (error) {
-  //     console.error('error searching reps', error);
-  //     throw new HttpException('Error searching', 500);
-  //   }
-  // }
-
   async searchRepositories(searchBy: SearchBy, name: string): Promise<any> {
-    const token = this.configService.get<string>('GITHUB_TOKEN');
-    const headers = {
-      Authorization: `token ${token}`,
-    };
+    let query: string;
+    console.log(searchBy);
 
+    switch (searchBy) {
+      case SearchBy.name:
+        console.log(searchBy);
+        query = `name:${name}`;
+        break;
+
+      case SearchBy.description:
+        query = `description:${name}`;
+        break;
+
+      case SearchBy.topics:
+        query = `topics:${name}`;
+        break;
+
+      case SearchBy.readme:
+        query = `readme:${name}`;
+        break;
+
+      case SearchBy.repoOwner:
+        query = `repo:owner/name:${name}`;
+        break;
+
+      default:
+        throw new HttpException('No case', 400);
+    }
+    const url = `${this.githubApiUrl}/search/repositories?q=${query}`;
     try {
-      const result = await firstValueFrom(
-        this.httpService.get(`${this.githubApiUrl}/search/repositories`, {
-          headers,
-          params: { q: `${name} ${searchBy}` },
-        }),
-      );
-
-      return result.data;
+      const response = await this.httpService.get(url).toPromise();
+      return response.data.items;
     } catch (error) {
-      throw new HttpException(error.response.data, error.response.status);
+      console.error('error searching reps', error);
+      throw new HttpException('Error searching', 500);
     }
   }
 
-  async addRepository(repoId: number, user: User): Promise<GitRepository> {
+  // async searchRepositories(searchBy: SearchBy, name: string): Promise<any> {
+  //   const token = this.configService.get<string>('GITHUB_TOKEN');
+  //   const headers = {
+  //     Authorization: `token ${token}`,
+  //   };
+
+  //   try {
+  //     const result = await firstValueFrom(
+  //       this.httpService.get(`${this.githubApiUrl}/search/repositories`, {
+  //         headers,
+  //         params: { q: `${name} ${searchBy}` },
+  //       }),
+  //     );
+
+  //     return result.data;
+  //   } catch (error) {
+  //     throw new HttpException(error.response.data, error.response.status);
+  //   }
+  // }
+
+  async addRepository(repoId: number, user: User): Promise<GitRepository[]> {
     const token = this.configService.get<string>('GITHUB_TOKEN');
     const headers = {
       Authorization: `token ${token}`,
@@ -112,8 +109,6 @@ export class GithubIneractionService {
           headers,
         }),
       );
-
-      // const userNoPass = this.userWithNoPassword(user.username)
 
       const repo = response.data;
       const newRepo = this.gitRepository.create({
@@ -129,8 +124,11 @@ export class GithubIneractionService {
         user,
       });
 
-      console.log(newRepo.user);
-      return this.gitRepository.save(newRepo);
+      this.gitRepository.save(newRepo);
+
+      return this.gitRepository.find({
+        where: { user: { username: user.username } },
+      });
     } catch (error) {
       throw new HttpException(error.response.data, error.response.status);
     }

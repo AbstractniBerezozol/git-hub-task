@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcryptjs';
+import { GitRepository } from '../github-ineraction/github-interaction/repository/repository.entity';
 
 @Injectable()
 export class UsersService {
@@ -14,7 +15,9 @@ export class UsersService {
   ) {}
 
   async findAll() {
-    const users = await this.userRepository.find();
+    const users = await this.userRepository.find({
+      relations: { repositories: true },
+    });
     for (const user of users) {
       delete user.password;
     }
@@ -22,16 +25,28 @@ export class UsersService {
   }
 
   async findOne(username: string) {
-    const user = await this.userRepository.findOne({ where: { username } });
+    const user = await this.userRepository.findOne({
+      where: { username },
+    });
     if (!user) {
       throw new NotFoundException(`User #${username} not found`);
     }
-    console.log(user.repositories);
+    return user;
+  }
+
+  async findOneUserWithRepos(username: string) {
+    const user = await this.userRepository.findOne({
+      where: { username },
+      relations: { repositories: true },
+    });
+    if (!user) {
+      throw new NotFoundException();
+    }
     return user;
   }
 
   async userWithNoPassword(username: string) {
-    const user = this.findOne(username);
+    const user = this.findOneUserWithRepos(username);
     delete (await user).password;
     return user;
   }

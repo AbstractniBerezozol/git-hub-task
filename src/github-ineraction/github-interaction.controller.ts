@@ -13,9 +13,9 @@ import { GithubIneractionService } from './github-ineraction.service';
 import { query } from 'express';
 import { Repository } from 'typeorm';
 import { GitRepository } from './github-interaction/repository/repository.entity';
-import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { SearchBy } from './github-interaction/repository/repository.enum';
 import { ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 
 @UseGuards(JwtAuthGuard)
 @ApiTags('github-interaction')
