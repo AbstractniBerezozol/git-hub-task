@@ -11,7 +11,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { HttpModule } from '@nestjs/axios';
 import { GitRepository } from './github-ineraction/github-interaction/repository/repository.entity';
 import { JwtModule } from '@nestjs/jwt';
-import {HandlebarsAdapter} from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter'
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { GithubInteractionModule } from './github-ineraction/github-interaction.module';
 import { EmailModule } from './email/email/email.module';
 import { MailerModule } from '@nestjs-modules/mailer';
@@ -41,32 +41,10 @@ import { EmailService } from './email/email-service/email.service';
     }),
     ConfigModule.forRoot({ isGlobal: true }),
     HttpModule,
-    
     ScheduleModule.forRoot(),
-    MailerModule.forRoot({
-      transport: {
-        host: 'smtp.mailtrap.io',
-        port: 2525,
-        auth: {
-          user: '',
-          pass: '',
-        },
-      },
-      defaults: {
-        from: '',
-      },
-      template: {
-        dir: join(__dirname, 'templates'),
-        adapter: new HandlebarsAdapter(),
-        options:{
-          strict: true,
-        }
-      }
-    }),
-
-    
+    EmailModule,
   ],
   controllers: [AppController],
-  providers: [AppService, EmailService],
+  providers: [AppService],
 })
 export class AppModule {}

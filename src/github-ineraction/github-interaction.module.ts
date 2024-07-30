@@ -10,7 +10,7 @@ import { EmailService } from '../email/email-service/email.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, GitRepository]), HttpModule],
+  imports: [TypeOrmModule.forFeature([User, GitRepository]), HttpModule, EmailModule],
   controllers: [GithubInteractionController],
   providers: [GithubIneractionService,],
 })

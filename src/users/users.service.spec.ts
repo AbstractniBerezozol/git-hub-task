@@ -8,11 +8,13 @@ describe('UsersService', () => {
   let service: UsersService;
 
   const mockUserService = {
+    create: jest.fn(),
     save: jest.fn(),
     findOne: jest.fn(),
     find: jest.fn(),
     preload: jest.fn(),
     delete: jest.fn(),
+    remove: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -42,13 +44,13 @@ describe('UsersService', () => {
       email: 'Coco@singimail.rs',
       repositories: [],
     } as User;
-
+    jest.spyOn(mockUserService, 'create').mockReturnValue(user);
     jest.spyOn(mockUserService, 'save').mockReturnValue(user);
 
     const result = await service.create(createUserDto);
 
-    expect(mockUserService.save).toBeCalled();
-    expect(mockUserService.save).toBeCalledWith(createUserDto);
+    expect(mockUserService.save).toHaveBeenCalled();
+    expect(mockUserService.save).toHaveBeenCalledWith(user);
 
     expect(result).toEqual(user);
   });
@@ -63,11 +65,11 @@ describe('UsersService', () => {
 
     const users = [user];
 
-    jest.spyOn(mockUserService, 'find').mockReturnValue(user);
+    jest.spyOn(mockUserService, 'find').mockReturnValue(users);
 
     const result = await service.findAll();
     expect(result).toEqual(users);
-    expect(mockUserService.find).toBeCalled();
+    expect(mockUserService.find).toHaveBeenCalled();
   });
   it('findOne => finds one user by username and returns its data', async () => {
     const user = {
@@ -95,7 +97,6 @@ describe('UsersService', () => {
       password: 'Coco12345',
       email: 'Coco@singimail.rs',
     };
-
     const user = {
       id: 1,
       username: 'Coco',
@@ -110,9 +111,13 @@ describe('UsersService', () => {
 
     expect(result).toEqual(user);
 
-    expect(mockUserService.save).toBeCalled();
-    expect(mockUserService.findOne).toBeCalledWith(username, updateUserDto);
+    expect(mockUserService.preload).toHaveBeenCalledWith({
+      username,
+      ...updateUserDto,
+    });
+    expect(mockUserService.save).toHaveBeenCalledWith(user);
   });
+
   it('remove => finds the user and delete it', async () => {
     const username = 'Coco';
     const user = {
@@ -123,13 +128,12 @@ describe('UsersService', () => {
       repositories: [],
     } as User;
 
-    jest.spyOn(mockUserService, 'delete').mockReturnValue(username);
+    jest.spyOn(mockUserService, 'remove').mockReturnValue(user);
 
     const result = await service.remove(username);
 
     expect(result).toEqual(user);
 
-    expect(mockUserService.delete).toBeCalled();
-    expect(mockUserService.delete).toBeCalledWith(username);
+    expect(mockUserService.remove).toHaveBeenCalledWith(user);
   });
 });

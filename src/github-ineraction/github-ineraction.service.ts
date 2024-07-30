@@ -18,7 +18,7 @@ export class GithubIneractionService {
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
-    // private readonly emailService: EmailService,
+    private readonly emailService: EmailService,
     @InjectRepository(User)
     private readonly userRep: Repository<User>,
     @InjectRepository(GitRepository)
@@ -155,48 +155,48 @@ export class GithubIneractionService {
     return this.gitRepository.find({ where: { user: user } });
   }
 
-  // async checkForUpdates() {
-  //   const repositories = await this.gitRepository.find({ relations: ['user'] });
-  //   for (const repo of repositories) {
-  //     try {
-  //       const url = `${this.githubApiUrl}/repositories/${repo.repoId}`;
-  //       const response = await this.httpService.get(url).toPromise();
-  //       const currentRepo = response.data;
+  async checkForUpdates() {
+    const repositories = await this.gitRepository.find({ relations: ['user'] });
+    for (const repo of repositories) {
+      try {
+        const url = `${this.githubApiUrl}/repositories/${repo.repoId}`;
+        const response = await this.httpService.get(url).toPromise();
+        const currentRepo = response.data;
 
-  //       const releaseUrl = `${this.githubApiUrl}/repos/${repo.full_name}/releases`;
-  //       const releasesResponse = await this.httpService.get(releaseUrl).toPromise();
-  //       const currentReleases = releasesResponse.data;
+        const releaseUrl = `${this.githubApiUrl}/repos/${repo.full_name}/releases`;
+        const releasesResponse = await this.httpService.get(releaseUrl).toPromise();
+        const currentReleases = releasesResponse.data;
 
-  //       if (
-  //         currentRepo.stargazers_count !== repo.stargazers_count ||
-  //         currentRepo.watchers_count !== repo.watchers_count ||
-  //         currentRepo.forks_count !== repo.forks_count ||
-  //         JSON.stringify(currentReleases) !== JSON.stringify(repo.releases)
-  //       ) {
-  //       //   const updateDetails = `Stargazers: ${currentRepo.stargazers_count},
-  //       //  Watchers: ${currentRepo.watchers_count}, Forks: ${currentRepo.forks_count}`;
-  //         await this.emailService.sendNotification(repo.user.email, repo.name);
+        if (
+          currentRepo.stargazers_count !== repo.stargazers_count ||
+          currentRepo.watchers_count !== repo.watchers_count ||
+          currentRepo.forks_count !== repo.forks_count ||
+          JSON.stringify(currentReleases) !== JSON.stringify(repo.releases)
+        ) {
+        //   const updateDetails = `Stargazers: ${currentRepo.stargazers_count},
+        //  Watchers: ${currentRepo.watchers_count}, Forks: ${currentRepo.forks_count}`;
+          await this.emailService.sendNotification(repo.user.email, repo.name);
 
-  //         repo.stargazers_count = currentRepo.stargazers_count;
-  //         repo.watchers_count = currentRepo.watchers_count;
-  //         repo.forks_count = currentRepo.forks_count;
-  //         repo.releases= currentReleases;
+          repo.stargazers_count = currentRepo.stargazers_count;
+          repo.watchers_count = currentRepo.watchers_count;
+          repo.forks_count = currentRepo.forks_count;
+          repo.releases= currentReleases;
 
-  //         await this.gitRepository.save(repo);
-  //       }
-  //     } catch (error) {
-  //       console.error('Failed to check the updates for repository', error);
-  //     }
-  //   }
-  // }
+          await this.gitRepository.save(repo);
+        }
+      } catch (error) {
+        console.error('Failed to check the updates for repository', error);
+      }
+    }
+  }
 
-  // async sendMonthSummary() {
-  //   const users = await this.userRep.find({ relations: ['repositories'] });
-  //   for (const user of users) {
-  //     const summary = user.repositories
-  //       .map((repo) => `- ${repo.name} `)
-  //       .join('\n');
-  //     await this.emailService.sendMounthSummary(user.email, summary);
-  //   }
-  // }
+  async sendMonthSummary() {
+    const users = await this.userRep.find({ relations: ['repositories'] });
+    for (const user of users) {
+      const summary = user.repositories
+        .map((repo) => `- ${repo.name} `)
+        .join('\n');
+      await this.emailService.sendMounthSummary(user.email, summary);
+    }
+  }
 }
