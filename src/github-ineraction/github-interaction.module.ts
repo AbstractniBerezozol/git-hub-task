@@ -6,10 +6,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { GitRepository } from './github-interaction/repository/repository.entity';
 import { EmailModule } from '../email/email/email.module';
 import { User } from '../users/entities/user.entity';
+import { EmailService } from '../email/email-service/email.service';
+import { MailerModule } from '@nestjs-modules/mailer';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, GitRepository]), HttpModule,],
+  imports: [TypeOrmModule.forFeature([User, GitRepository]), HttpModule],
   controllers: [GithubInteractionController],
-  providers: [GithubIneractionService],
+  providers: [GithubIneractionService,],
 })
 export class GithubInteractionModule {}

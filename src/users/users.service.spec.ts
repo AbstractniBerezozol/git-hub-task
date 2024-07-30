@@ -8,10 +8,10 @@ describe('UsersService', () => {
   let service: UsersService;
 
   const mockUserService = {
-    create: jest.fn(),
+    save: jest.fn(),
     findOne: jest.fn(),
-    findAll: jest.fn(),
-    update: jest.fn(),
+    find: jest.fn(),
+    preload: jest.fn(),
     delete: jest.fn(),
   };
 
@@ -43,12 +43,12 @@ describe('UsersService', () => {
       repositories: [],
     } as User;
 
-    jest.spyOn(mockUserService, 'create').mockReturnValue(user);
+    jest.spyOn(mockUserService, 'save').mockReturnValue(user);
 
     const result = await service.create(createUserDto);
 
-    expect(mockUserService.create).toBeCalled();
-    expect(mockUserService.create).toBeCalledWith(createUserDto);
+    expect(mockUserService.save).toBeCalled();
+    expect(mockUserService.save).toBeCalledWith(createUserDto);
 
     expect(result).toEqual(user);
   });
@@ -63,11 +63,11 @@ describe('UsersService', () => {
 
     const users = [user];
 
-    jest.spyOn(mockUserService, 'findAll').mockReturnValue(user);
+    jest.spyOn(mockUserService, 'find').mockReturnValue(user);
 
     const result = await service.findAll();
     expect(result).toEqual(users);
-    expect(mockUserService.findAll).toBeCalled();
+    expect(mockUserService.find).toBeCalled();
   });
   it('findOne => finds one user by username and returns its data', async () => {
     const user = {
@@ -104,16 +104,16 @@ describe('UsersService', () => {
       repositories: [],
     } as User;
 
-    jest.spyOn(mockUserService, 'update').mockReturnValue(user);
+    jest.spyOn(mockUserService, 'preload').mockReturnValue(user);
 
     const result = await service.update(username, updateUserDto);
 
     expect(result).toEqual(user);
 
-    expect(mockUserService.update).toBeCalled();
+    expect(mockUserService.save).toBeCalled();
     expect(mockUserService.findOne).toBeCalledWith(username, updateUserDto);
   });
-  it('delete => finds the user and delete it', async () => {
+  it('remove => finds the user and delete it', async () => {
     const username = 'Coco';
     const user = {
       id: 1,

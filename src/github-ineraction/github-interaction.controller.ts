@@ -27,10 +27,12 @@ export class GithubInteractionController {
   async searchRepositories(
     @Query('searchBy') searchBy: SearchBy,
     @Param('value') value: string,
+    @Query('owner') owner: string,
   ) {
     console.log(value);
     console.log(searchBy);
-    return this.githubService.searchRepositories(searchBy, value);
+    console.log(owner);
+    return this.githubService.searchRepositories(searchBy, value, owner);
   }
 
   @Post('add-repository/:repoId')

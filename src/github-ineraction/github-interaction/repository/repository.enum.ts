@@ -5,5 +5,5 @@ export enum SearchBy {
   description = 'description',
   topics ='topics',
   readme = 'readme',
-  repoOwner='repo:owner/name'
+  repoOwner='repoOwner'
 }

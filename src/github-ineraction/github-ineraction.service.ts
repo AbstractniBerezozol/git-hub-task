@@ -16,9 +16,9 @@ export class GithubIneractionService {
   private readonly githubApiUrl = 'https://api.github.com';
 
   constructor(
-    // private readonly emailService: EmailService,
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
+    // private readonly emailService: EmailService,
     @InjectRepository(User)
     private readonly userRep: Repository<User>,
     @InjectRepository(GitRepository)
@@ -38,7 +38,11 @@ export class GithubIneractionService {
   //   return user;
   // }
 
-  async searchRepositories(searchBy: SearchBy, name: string): Promise<any> {
+  async searchRepositories(
+    searchBy: SearchBy,
+    name: string,
+    owner: string,
+  ): Promise<any> {
     let query: string;
     console.log(searchBy);
 
@@ -61,12 +65,14 @@ export class GithubIneractionService {
         break;
 
       case SearchBy.repoOwner:
-        query = `repo:owner/name:${name}`;
+        query = `"repo:${owner}/${name}"`;
         break;
 
       default:
         throw new HttpException('No case', 400);
     }
+    console.log(query);
+
     const url = `${this.githubApiUrl}/search/repositories?q=${query}`;
     try {
       const response = await this.httpService.get(url).toPromise();
@@ -121,6 +127,7 @@ export class GithubIneractionService {
         stargazers_count: repo.stargazers_count,
         watchers_count: repo.watchers_count,
         forks_count: repo.forks_count,
+        releases: repo.releases,
         user,
       });
 
@@ -156,10 +163,15 @@ export class GithubIneractionService {
   //       const response = await this.httpService.get(url).toPromise();
   //       const currentRepo = response.data;
 
+  //       const releaseUrl = `${this.githubApiUrl}/repos/${repo.full_name}/releases`;
+  //       const releasesResponse = await this.httpService.get(releaseUrl).toPromise();
+  //       const currentReleases = releasesResponse.data;
+
   //       if (
   //         currentRepo.stargazers_count !== repo.stargazers_count ||
   //         currentRepo.watchers_count !== repo.watchers_count ||
-  //         currentRepo.forks_count !== repo.forks_count
+  //         currentRepo.forks_count !== repo.forks_count ||
+  //         JSON.stringify(currentReleases) !== JSON.stringify(repo.releases)
   //       ) {
   //       //   const updateDetails = `Stargazers: ${currentRepo.stargazers_count},
   //       //  Watchers: ${currentRepo.watchers_count}, Forks: ${currentRepo.forks_count}`;
@@ -168,6 +180,7 @@ export class GithubIneractionService {
   //         repo.stargazers_count = currentRepo.stargazers_count;
   //         repo.watchers_count = currentRepo.watchers_count;
   //         repo.forks_count = currentRepo.forks_count;
+  //         repo.releases= currentReleases;
 
   //         await this.gitRepository.save(repo);
   //       }
