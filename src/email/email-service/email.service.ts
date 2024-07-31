@@ -28,6 +28,16 @@ export class EmailService {
     });
   }
 
+  // async sendTest(email: string) {
+  //   const subject = 'Here here here';
+  //   const text = `Hello, please, here is your death`;
+  //   await this.mailerService.sendMail({
+  //     to: email,
+  //     subject: subject,
+  //     text: text,
+  //   });
+  // }
+
   // private transporter;
   // private userService: UsersService;
   // constructor(private configService: ConfigService) {

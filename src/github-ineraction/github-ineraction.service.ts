@@ -164,7 +164,9 @@ export class GithubIneractionService {
         const currentRepo = response.data;
 
         const releaseUrl = `${this.githubApiUrl}/repos/${repo.full_name}/releases`;
-        const releasesResponse = await this.httpService.get(releaseUrl).toPromise();
+        const releasesResponse = await this.httpService
+          .get(releaseUrl)
+          .toPromise();
         const currentReleases = releasesResponse.data;
 
         if (
@@ -172,15 +174,14 @@ export class GithubIneractionService {
           currentRepo.watchers_count !== repo.watchers_count ||
           currentRepo.forks_count !== repo.forks_count ||
           JSON.stringify(currentReleases) !== JSON.stringify(repo.releases)
+           
         ) {
-        //   const updateDetails = `Stargazers: ${currentRepo.stargazers_count},
-        //  Watchers: ${currentRepo.watchers_count}, Forks: ${currentRepo.forks_count}`;
           await this.emailService.sendNotification(repo.user.email, repo.name);
 
           repo.stargazers_count = currentRepo.stargazers_count;
           repo.watchers_count = currentRepo.watchers_count;
           repo.forks_count = currentRepo.forks_count;
-          repo.releases= currentReleases;
+          repo.releases = currentReleases;
 
           await this.gitRepository.save(repo);
         }
@@ -199,4 +200,8 @@ export class GithubIneractionService {
       await this.emailService.sendMounthSummary(user.email, summary);
     }
   }
+
+  // async testEmailing(email) {
+  //   await this.emailService.sendTest(email);
+  // }
 }

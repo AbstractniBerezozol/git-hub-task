@@ -57,6 +57,12 @@ export class GithubInteractionController {
   async getWatchlist(@Request() req): Promise<GitRepository[]> {
     return this.githubService.getWatchlist(req.user);
   }
+
+  // @Get('sendEmail')
+  // async sendEmail() {
+  //   const email = 'aleksandr.i.zolotaryev@gmail.com';
+  //   return this.githubService.testEmailing(email);
+  // }
   // @Get('user/:username')
   // async getUser(@Param('username') username: string) {
   //   return this.githubService.getUser(username);

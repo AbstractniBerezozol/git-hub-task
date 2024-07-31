@@ -13,15 +13,15 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         transport: {
-          host: 'smtp.mailtrap.io',
-          port: 2525,
+          host: configService.get<string>('EMAIL_HOST'),
+          port: configService.get<number>('EMAIL_PORT'),
           auth: {
             user: configService.get<string>('USERNAME'),
             pass: configService.get<string>('USERPASSWORD'),
           },
         },
         defaults: {
-          from: 'default',
+          from: `"No reply <${configService.get<string>('EMAIL_FROM')}"`,
         },
         template: {
           dir: join(__dirname, 'templates'),
@@ -35,6 +35,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     }),
   ],
   providers: [EmailService],
-  exports:[EmailService]
+  exports: [EmailService],
 })
 export class EmailModule {}
