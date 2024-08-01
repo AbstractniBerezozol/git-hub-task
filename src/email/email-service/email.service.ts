@@ -19,7 +19,7 @@ export class EmailService {
   }
 
   async sendMounthSummary(userEmail: string, summary: string) {
-    const subject = 'Here is your mounth summary';
+    const subject = 'Here is your month summary';
     const text = `Hello, please, here is your monthly summary activity:\n\n${summary}`;
     await this.mailerService.sendMail({
       to: userEmail,

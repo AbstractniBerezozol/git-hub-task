@@ -1,18 +1,56 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { EmailService } from './email.service';
+import { MailerService } from '@nestjs-modules/mailer';
+import { ApiGatewayTimeoutResponse } from '@nestjs/swagger';
+import { Subject } from 'rxjs';
+const mockMailerService = {
+  sendMail: jest.fn().mockResolvedValue({}),
+};
 
 describe('EmailService', () => {
-  let service: EmailService;
+  let emailService: EmailService;
+  let mailerService: MailerService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [EmailService],
+      providers: [
+        EmailService,
+        { provide: MailerService, useValue: mockMailerService },
+      ],
     }).compile();
 
-    service = module.get<EmailService>(EmailService);
+    emailService = module.get<EmailService>(EmailService);
+    mailerService = module.get<MailerService>(MailerService);
   });
 
   it('should be defined', () => {
-    expect(service).toBeDefined();
+    expect(emailService).toBeDefined();
   });
+
+  it('should send notification email', async () => {
+    const userMail = 'aleksandr.zolotarev@abstract.rs';
+    const repoName = 'facebook/React';
+
+    await emailService.sendNotification(userMail, repoName);
+
+    expect(mailerService.sendMail).toHaveBeenCalledWith({
+      to: userMail,
+      subject: 'Here is update from your list!',
+      text: `Hello, it is update ${repoName} from your Watchlist!!!`,
+    });
+  });
+
+  it('should send summary email', async () => {
+    const userMail = 'aleksandr.zolotarev@abstract.rs';
+    const summary = 'Hello, please, here is your monthly summary activity';
+
+    await emailService.sendMounthSummary(userMail, summary);
+
+    expect(mailerService.sendMail).toHaveBeenCalledWith({
+      to: userMail,
+      subject: 'Here is your month summary',
+      text: `Hello, please, here is your monthly summary activity:\n\n${summary}`,
+    });
+  });
+
 });

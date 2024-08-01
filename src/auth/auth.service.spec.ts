@@ -51,7 +51,7 @@ describe('AuthService', () => {
       mockUserService.findOne.mockResolvedValue(user);
       jest.spyOn(bcrypt, 'compare').mockResolvedValueOnce(false);
       await expect(
-        authService.login({ username: 'Coco', password: 'Coco1234' }),
+        authService.login({ username: 'Coco', password: 'garantija' })
       ).rejects.toThrow(UnauthorizedException);
     });
 
