@@ -41,8 +41,8 @@ export class GitRepository {
   @Column()
   forks_count: number;
 
-  @Column('json', { nullable: true })
-  releases: any[];
+  @Column({ nullable: true })
+  latestRelease: string;
 
   @ManyToOne(() => User, (user) => user.repositories)
   user: User;

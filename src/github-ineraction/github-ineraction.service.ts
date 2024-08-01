@@ -127,7 +127,7 @@ export class GithubIneractionService {
         stargazers_count: repo.stargazers_count,
         watchers_count: repo.watchers_count,
         forks_count: repo.forks_count,
-        releases: repo.releases,
+        latestRelease: repo.latestRelease,
         user,
       });
 
@@ -155,38 +155,38 @@ export class GithubIneractionService {
     return this.gitRepository.find({ where: { user: user } });
   }
 
+  async getLatestReliase(gitRepository: GitRepository) {
+    const token = this.configService.get<string>('GITHUB_TOKEN');
+    const headers = {
+      Authorization: `token ${token}`,
+    };
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get(
+          `${this.githubApiUrl}/repos/${gitRepository.full_name}/latest`,
+          {
+            headers,
+          },
+        ),
+      );
+      return response.data.name;
+    } catch (error) {
+      console.log(
+        `For repository ${gitRepository.repoId} latest reliase is not found`,
+      );
+    }
+  }
+
   async checkForUpdates() {
     const repositories = await this.gitRepository.find({ relations: ['user'] });
     for (const repo of repositories) {
-      try {
-        const url = `${this.githubApiUrl}/repositories/${repo.repoId}`;
-        const response = await this.httpService.get(url).toPromise();
-        const currentRepo = response.data;
+      const release = await this.getLatestReliase(repo);
 
-        const releaseUrl = `${this.githubApiUrl}/repos/${repo.full_name}/releases`;
-        const releasesResponse = await this.httpService
-          .get(releaseUrl)
-          .toPromise();
-        const currentReleases = releasesResponse.data;
+      if (repo.latestRelease != release) {
+        repo.latestRelease = release;
+        this.gitRepository.save(repo);
 
-        if (
-          currentRepo.stargazers_count !== repo.stargazers_count ||
-          currentRepo.watchers_count !== repo.watchers_count ||
-          currentRepo.forks_count !== repo.forks_count ||
-          JSON.stringify(currentReleases) !== JSON.stringify(repo.releases)
-           
-        ) {
-          await this.emailService.sendNotification(repo.user.email, repo.name);
-
-          repo.stargazers_count = currentRepo.stargazers_count;
-          repo.watchers_count = currentRepo.watchers_count;
-          repo.forks_count = currentRepo.forks_count;
-          repo.releases = currentReleases;
-
-          await this.gitRepository.save(repo);
-        }
-      } catch (error) {
-        console.error('Failed to check the updates for repository', error);
+        this.emailService.sendNotification(repo.user.email, repo.name);
       }
     }
   }
@@ -201,7 +201,8 @@ export class GithubIneractionService {
     }
   }
 
-  // async testEmailing(email) {
-  //   await this.emailService.sendTest(email);
-  // }
+  async testEmailing(email: string) {
+    console.log(email);
+    await this.emailService.sendTest(email);
+  }
 }

@@ -58,11 +58,12 @@ export class GithubInteractionController {
     return this.githubService.getWatchlist(req.user);
   }
 
-  // @Get('sendEmail')
-  // async sendEmail() {
-  //   const email = 'aleksandr.i.zolotaryev@gmail.com';
-  //   return this.githubService.testEmailing(email);
-  // }
+  @Get('sendEmail')
+  async sendEmail(@Param('email') email: string) {
+    email = 'alexander.i.zolotaryev@gmail.com';
+    console.log(email);
+    return this.githubService.testEmailing(email);
+  }
   // @Get('user/:username')
   // async getUser(@Param('username') username: string) {
   //   return this.githubService.getUser(username);

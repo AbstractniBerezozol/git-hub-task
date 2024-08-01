@@ -7,27 +7,26 @@ import { User } from '../users/entities/user.entity';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
+import { UnauthorizedException } from '@nestjs/common';
+import passport from 'passport';
 
+const mockUserService = {
+  findOne: jest.fn(),
+};
+const mockJwtService = {
+  sign: jest.fn().mockReturnValue('mockAccessToken'),
+};
 describe('AuthService', () => {
   let authService: AuthService;
   let usersService: UsersService;
   let jwtService: JwtService;
 
-  const mockUserService = {
-    findOne: jest.fn(),
-  };
-  const mockJwtService = {
-    sign: jest.fn().mockReturnValue('mockAccessToken'),
-  };
-
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        
         { provide: UsersService, useValue: mockUserService },
         { provide: JwtService, useValue: mockJwtService },
-        AuthService
-        ,
+        AuthService,
       ],
     }).compile();
 
@@ -39,23 +38,42 @@ describe('AuthService', () => {
   it('should be defined', () => {
     expect(authService).toBeDefined();
   });
-  it('login => should return jwt token for logging', async () => {
-    const user = {
-      id: 1,
-      username: 'Coco',
-      password: 'Coco123',
-      repositories: [],
-    } as User;
-    mockUserService.findOne.mockResolvedValue(user);
-    jest.spyOn(bcrypt, 'compare').mockResolvedValueOnce(true);
-
-    const result = await authService.login({
-      username: 'Coco',
-      password: 'Coco123',
+  describe('login', () => {
+    it('should throw an exception if user is not found', async () => {
+      mockUserService.findOne.mockResolvedValue(null);
+      await expect(
+        authService.login({ username: 'Coco', password: 'Coco123' }),
+      ).rejects.toThrow(UnauthorizedException);
     });
-    expect(result).toHaveProperty('access_token');
-    expect(jwtService.sign).toHaveBeenCalledWith({ username: 'Coco' });
+
+    it('should throw an exception if password is wrong', async () => {
+      const user = { username: 'Coco', password: 'Coco123' };
+      mockUserService.findOne.mockResolvedValue(user);
+      jest.spyOn(bcrypt, 'compare').mockResolvedValueOnce(false);
+      await expect(
+        authService.login({ username: 'Coco', password: 'Coco1234' }),
+      ).rejects.toThrow(UnauthorizedException);
+    });
+
+    it(' should return jwt token for logging', async () => {
+      const user = {
+        id: 1,
+        username: 'Coco',
+        password: 'Coco123',
+        repositories: [],
+      } as User;
+      mockUserService.findOne.mockResolvedValue(user);
+      jest.spyOn(bcrypt, 'compare').mockResolvedValueOnce(true);
+
+      const result = await authService.login({
+        username: 'Coco',
+        password: 'Coco123',
+      });
+      expect(result).toHaveProperty('access_token');
+      expect(jwtService.sign).toHaveBeenCalledWith({ username: 'Coco' });
+    });
   });
+
   // it('register => should creates new user', async () => {
   //   const createUserDto = {
   //     username: 'Coco',
