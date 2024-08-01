@@ -59,8 +59,8 @@ export class GithubInteractionController {
   }
 
   @Get('sendEmail')
-  async sendEmail(@Param('email') email: string) {
-    email = 'alexander.i.zolotaryev@gmail.com';
+  async sendEmail(@Query('email') email: string) {
+    email = 'aleksandr.zolotarev@abstract.rs';
     console.log(email);
     return this.githubService.testEmailing(email);
   }

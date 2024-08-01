@@ -23,13 +23,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         defaults: {
           from: `"No reply <${configService.get<string>('EMAIL_FROM')}"`,
         },
-        template: {
-          dir: join(__dirname, 'templates'),
-          adapter: new HandlebarsAdapter(),
-          options: {
-            strict: true,
-          },
-        },
       }),
       inject: [ConfigService],
     }),

@@ -49,9 +49,9 @@ describe('AuthService', () => {
     it('should throw an exception if password is wrong', async () => {
       const user = { username: 'Coco', password: 'Coco123' };
       mockUserService.findOne.mockResolvedValue(user);
-      jest.spyOn(bcrypt, 'compare').mockResolvedValueOnce(false);
+      jest.spyOn(bcrypt, 'compare').mockReturnValueOnce(false);
       await expect(
-        authService.login({ username: 'Coco', password: 'garantija' })
+        authService.login({ username: 'Coco', password: 'garantija' }),
       ).rejects.toThrow(UnauthorizedException);
     });
 
@@ -63,14 +63,15 @@ describe('AuthService', () => {
         repositories: [],
       } as User;
       mockUserService.findOne.mockResolvedValue(user);
-      jest.spyOn(bcrypt, 'compare').mockResolvedValueOnce(true);
+      jest.spyOn(bcrypt, 'compare').mockReturnValueOnce(true);
 
       const result = await authService.login({
         username: 'Coco',
         password: 'Coco123',
       });
       expect(result).toHaveProperty('access_token');
-      expect(jwtService.sign).toHaveBeenCalledWith({ username: 'Coco' });
+      const { password: password2, ...res } = user;
+      expect(jwtService.sign).toHaveBeenCalledWith(res);
     });
   });
 
