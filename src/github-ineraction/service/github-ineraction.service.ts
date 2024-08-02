@@ -1,15 +1,13 @@
 import { HttpService } from '@nestjs/axios';
 import { HttpException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { response } from 'express';
 import { firstValueFrom } from 'rxjs';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { GitRepository } from './github-interaction/repository/repository.entity';
-import { User } from 'src/users/entities/user.entity';
-import { SearchBy } from './github-interaction/repository/repository.enum';
-import { UsersService } from '../users/users.service';
-import { EmailService } from '../email/email-service/email.service';
+import { SearchBy } from '../domain/enum/repository.enum';
+import { GitRepository } from '../domain/entity/repository.entity';
+import { User } from '../../users/domain/user.entity';
+import { EmailService } from '../../email/service/email.service';
 
 @Injectable()
 export class GithubIneractionService {
@@ -180,8 +178,8 @@ export class GithubIneractionService {
   async checkForUpdates() {
     const repositories = await this.gitRepository.find({ relations: ['user'] });
     for (const repo of repositories) {
+      // const release = await this.getLatestReliase(repo);
       const release = await this.getLatestReliase(repo);
-
       if (repo.latestRelease != release) {
         repo.latestRelease = release;
         this.gitRepository.save(repo);

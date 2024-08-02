@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { GithubInteractionController } from './github-interaction.controller';
+import { GithubInteractionController } from '../../src/controller/github-interaction.controller';
 
 describe('GithubInteractionController', () => {
   let controller: GithubInteractionController;
@@ -9,7 +9,9 @@ describe('GithubInteractionController', () => {
       controllers: [GithubInteractionController],
     }).compile();
 
-    controller = module.get<GithubInteractionController>(GithubInteractionController);
+    controller = module.get<GithubInteractionController>(
+      GithubInteractionController,
+    );
   });
 
   it('should be defined', () => {

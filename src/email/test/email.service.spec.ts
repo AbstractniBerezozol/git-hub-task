@@ -1,8 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { EmailService } from './email.service';
 import { MailerService } from '@nestjs-modules/mailer';
-import { ApiGatewayTimeoutResponse } from '@nestjs/swagger';
-import { Subject } from 'rxjs';
+import { EmailService } from '../../src/service/email.service';
 const mockMailerService = {
   sendMail: jest.fn().mockResolvedValue({}),
 };
@@ -52,5 +50,4 @@ describe('EmailService', () => {
       text: `Hello, please, here is your monthly summary activity:\n\n${summary}`,
     });
   });
-
 });

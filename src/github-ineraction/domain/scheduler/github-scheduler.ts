@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { GithubIneractionService } from './github-ineraction.service';
+import { GithubIneractionService } from '../../service/github-ineraction.service';
 
 @Injectable()
 export class GitHubScheduler {

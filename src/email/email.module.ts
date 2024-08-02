@@ -1,11 +1,7 @@
 import { MailerModule } from '@nestjs-modules/mailer';
 import { Module } from '@nestjs/common';
-import * as nodemailer from 'nodemailer';
-import { GithubIneractionService } from '../../github-ineraction/github-ineraction.service';
-import { EmailService } from '../email-service/email.service';
-import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-import { join } from 'path';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { EmailService } from './service/email.service';
 
 @Module({
   imports: [

@@ -1,17 +1,18 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthService } from './auth.service';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { AuthPayloadDto } from './dto/auth.dto';
-import { UsersService } from '../users/users.service';
-import { User } from '../users/entities/user.entity';
-import { CreateUserDto } from '../users/dto/create-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { UnauthorizedException } from '@nestjs/common';
-import passport from 'passport';
+import { User } from '../../users/domain/user.entity';
+import { UsersService } from '../../users/service/users.service';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { create } from 'domain';
+import { AuthService } from '../service/auth.service';
+import { CreateUserDto } from '../../users/domain/dto/create-user.dto';
 
 const mockUserService = {
   findOne: jest.fn(),
+  create: jest.fn(),
+  save: jest.fn(),
 };
 const mockJwtService = {
   sign: jest.fn().mockReturnValue('mockAccessToken'),
@@ -75,27 +76,20 @@ describe('AuthService', () => {
     });
   });
 
-  // it('register => should creates new user', async () => {
-  //   const createUserDto = {
-  //     username: 'Coco',
-  //     password: 'Coco123',
-  //     email: 'Coco@singimail.rs',
-  //   } as CreateUserDto;
-  //   const user = {
-  //     id: 1,
-  //     username: 'Coco',
-  //     password: 'Coco123',
-  //     email: 'Coco@singimail.rs',
-  //     repositories: [],
-  //   } as User;
+  describe('register', () => {
+    it('should register a new user', async () => {
+      const createUserDto: CreateUserDto = {
+        username: 'Coco',
+        password: 'Coco123',
+        email: 'Coco@gmail.com',
+      };
+      const expectedUser = { ...createUserDto, id: 2 };
+      mockUserService.create.mockResolvedValue(expectedUser);
 
-  //   jest.spyOn(usersService, 'create').mockResolvedValue(user);
+      const result = await authService.register(createUserDto);
 
-  //   const result = await usersService.create(createUserDto);
-
-  //   expect(usersService.create).toBeCalled();
-  //   expect(usersService.create).toBeCalledWith(createUserDto);
-
-  //   expect(result).toEqual(user);
-  // });
+      expect(result).toEqual(expectedUser);
+      expect(mockUserService.create).toHaveBeenCalledWith(createUserDto);
+    });
+  });
 });

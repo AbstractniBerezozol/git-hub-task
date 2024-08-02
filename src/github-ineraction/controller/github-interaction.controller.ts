@@ -9,13 +9,14 @@ import {
   Delete,
   Body,
 } from '@nestjs/common';
-import { GithubIneractionService } from './github-ineraction.service';
+import { GithubIneractionService } from '../service/github-ineraction.service';
 import { query } from 'express';
 import { Repository } from 'typeorm';
-import { GitRepository } from './github-interaction/repository/repository.entity';
-import { SearchBy } from './github-interaction/repository/repository.enum';
+
+import { SearchBy } from '../domain/enum/repository.enum';
 import { ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt.guard';
+import { JwtAuthGuard } from '../../auth/guards/jwt.guard';
+import { GitRepository } from '../domain/entity/repository.entity';
 
 @UseGuards(JwtAuthGuard)
 @ApiTags('github-interaction')
@@ -58,19 +59,9 @@ export class GithubInteractionController {
     return this.githubService.getWatchlist(req.user);
   }
 
-  @Get('sendEmail')
+  @Get('sendTestEmail')
   async sendEmail(@Query('email') email: string) {
     email = 'aleksandr.zolotarev@abstract.rs';
-    console.log(email);
     return this.githubService.testEmailing(email);
   }
-  // @Get('user/:username')
-  // async getUser(@Param('username') username: string) {
-  //   return this.githubService.getUser(username);
-  // }
-
-  // @Get('search')
-  // async searchUsers(@Query('q') query: string) {
-  //   return this.githubService.searchUsers(query);
-  // }
 }

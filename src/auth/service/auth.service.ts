@@ -1,11 +1,11 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { AuthPayloadDto } from './dto/auth.dto';
+
 import { JwtService } from '@nestjs/jwt';
-import { CreateUserDto } from '../users/dto/create-user.dto';
-import { UsersService } from '../users/users.service';
+
 import * as bcrypt from 'bcryptjs';
-import { retry } from 'rxjs';
-import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
+import { UsersService } from '../../users/service/users.service';
+import { AuthPayloadDto } from '../domain/dto/auth.dto';
+import { CreateUserDto } from '../../users/domain/dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -14,11 +14,9 @@ export class AuthService {
     private userService: UsersService,
   ) {}
 
-  
-
   async login({ username, password }: AuthPayloadDto) {
     const user = await this.userService.findOne(username);
-    console.log({user});
+    console.log({ user });
     if (!user) {
       throw new UnauthorizedException();
     }

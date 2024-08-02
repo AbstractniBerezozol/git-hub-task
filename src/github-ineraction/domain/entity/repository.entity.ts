@@ -5,8 +5,9 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from '../../../users/entities/user.entity';
+
 import { ApiProperty } from '@nestjs/swagger';
+import { User } from '../../../users/domain/user.entity';
 
 @Entity()
 export class GitRepository {

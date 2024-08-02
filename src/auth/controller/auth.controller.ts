@@ -10,11 +10,11 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { AuthPayloadDto } from './dto/auth.dto';
-import { AuthService } from './auth.service';
-import { JwtAuthGuard } from './guards/jwt.guard';
+import { AuthPayloadDto } from '../domain/dto/auth.dto';
+import { AuthService } from '../service/auth.service';
+import { JwtAuthGuard } from '../guards/jwt.guard';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
-import { CreateUserDto } from '../users/dto/create-user.dto';
+import { CreateUserDto } from '../../users/domain/dto/create-user.dto';
 
 @ApiTags('auth')
 @ApiBearerAuth()
