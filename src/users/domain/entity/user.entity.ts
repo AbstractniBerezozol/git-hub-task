@@ -1,9 +1,6 @@
-
-
 import { ApiProperty } from '@nestjs/swagger';
-
 import { Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn, Repository } from 'typeorm';
-import { GitRepository } from '../../github-ineraction/domain/entity/repository.entity';
+import { GitRepository } from '../../../github-ineraction/domain/entity/repository.entity';
 
 @Entity()
 export class User {

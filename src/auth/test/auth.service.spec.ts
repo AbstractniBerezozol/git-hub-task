@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { UnauthorizedException } from '@nestjs/common';
-import { User } from '../../users/domain/user.entity';
+import { User } from '../../users/domain/entity/user.entity';
 import { UsersService } from '../../users/service/users.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { create } from 'domain';

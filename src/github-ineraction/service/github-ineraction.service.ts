@@ -6,7 +6,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SearchBy } from '../domain/enum/repository.enum';
 import { GitRepository } from '../domain/entity/repository.entity';
-import { User } from '../../users/domain/user.entity';
+import { User } from '../../users/domain/entity/user.entity';
 import { EmailService } from '../../email/service/email.service';
 
 @Injectable()
