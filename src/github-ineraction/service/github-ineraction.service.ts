@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios';
-import { HttpException, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
 import { Repository } from 'typeorm';
@@ -24,7 +24,7 @@ export class GithubIneractionService {
   ) {}
 
   async getUser(username: string): Promise<User> {
-    return this.userRep.findOne({
+    return this.userRep.findOneOrFail({
       where: { username },
       relations: ['repositories'],
     });
@@ -67,7 +67,7 @@ export class GithubIneractionService {
         break;
 
       default:
-        throw new HttpException('No case', 400);
+        throw new BadRequestException('Something went wrong');
     }
     console.log(query);
 
@@ -80,26 +80,6 @@ export class GithubIneractionService {
       throw new HttpException('Error searching', 500);
     }
   }
-
-  // async searchRepositories(searchBy: SearchBy, name: string): Promise<any> {
-  //   const token = this.configService.get<string>('GITHUB_TOKEN');
-  //   const headers = {
-  //     Authorization: `token ${token}`,
-  //   };
-
-  //   try {
-  //     const result = await firstValueFrom(
-  //       this.httpService.get(`${this.githubApiUrl}/search/repositories`, {
-  //         headers,
-  //         params: { q: `${name} ${searchBy}` },
-  //       }),
-  //     );
-
-  //     return result.data;
-  //   } catch (error) {
-  //     throw new HttpException(error.response.data, error.response.status);
-  //   }
-  // }
 
   async addRepository(repoId: number, user: User): Promise<GitRepository[]> {
     const token = this.configService.get<string>('GITHUB_TOKEN');
@@ -135,7 +115,7 @@ export class GithubIneractionService {
         where: { user: { username: user.username } },
       });
     } catch (error) {
-      throw new HttpException(error.response.data, error.response.status);
+      throw console.error(error);
     }
   }
 
@@ -178,7 +158,6 @@ export class GithubIneractionService {
   async checkForUpdates() {
     const repositories = await this.gitRepository.find({ relations: ['user'] });
     for (const repo of repositories) {
-      // const release = await this.getLatestReliase(repo);
       const release = await this.getLatestReliase(repo);
       if (repo.latestRelease != release) {
         repo.latestRelease = release;
