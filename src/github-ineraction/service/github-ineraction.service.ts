@@ -109,13 +109,14 @@ export class GithubIneractionService {
         user,
       });
 
-      this.gitRepository.save(newRepo);
+     await this.gitRepository.save(newRepo);
 
       return this.gitRepository.find({
         where: { user: { username: user.username } },
       });
     } catch (error) {
-      throw console.error(error);
+      console.error('New error here', error);
+      throw new Error('{{Salam Slavjanam}}');
     }
   }
 

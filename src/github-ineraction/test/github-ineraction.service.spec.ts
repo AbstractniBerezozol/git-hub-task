@@ -172,11 +172,13 @@ describe('GithubIneractionService', () => {
           watchers_count: 6,
           forks_count: 10509,
           latestRelease: 'v1.7.19',
+          // user: mockUser,
         },
       };
-      mockHttpService.get.mockResolvedValue(mockResponse);
 
-      mockRepository.findOne.mockResolvedValue(mockUser);
+      mockHttpService.get.mockReturnValue(of(mockResponse));
+
+      mockRepository.find.mockResolvedValue([mockRepository]);
       mockRepository.create.mockReturnValue({ id: 1, repoId: mockRepoId });
       mockRepository.save.mockResolvedValue({ id: 1, repoId: mockRepoId });
 
@@ -390,7 +392,6 @@ describe('GithubIneractionService', () => {
       mockRepository.find.mockResolvedValue([mockUser]);
       const mockResponse = { data: { name: 'v1.7.19' } };
       mockHttpService.get.mockResolvedValue(mockResponse);
-
 
       await githubInteractionService.checkForUpdates();
       expect(mockRepository.save).not.toHaveBeenCalled();
