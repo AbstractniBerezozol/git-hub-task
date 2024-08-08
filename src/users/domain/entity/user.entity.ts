@@ -1,8 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn, Repository } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  Repository,
+  Unique,
+} from 'typeorm';
 import { GitRepository } from '../../../github-ineraction/domain/entity/repository.entity';
+import { UserRole } from '../enum/roles.enum';
 
 @Entity()
+@Unique('unique_username', ['username'])
+@Unique('unique_email', ['email'])
 export class User {
   @ApiProperty()
   @PrimaryGeneratedColumn()
@@ -13,6 +24,8 @@ export class User {
   password: string;
   @Column()
   email: string;
-  @OneToMany(() => GitRepository, repository => repository.user,)
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
+  roles: string[];
+  @OneToMany(() => GitRepository, (repository) => repository.user)
   repositories: GitRepository[];
 }

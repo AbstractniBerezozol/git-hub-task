@@ -6,8 +6,9 @@ import { GithubIneractionService } from '../../service/github-ineraction.service
 export class GitHubScheduler {
   constructor(private readonly githubService: GithubIneractionService) {}
 
-  @Cron(CronExpression.EVERY_2_HOURS)
+  @Cron(CronExpression.EVERY_10_SECONDS)
   async handleCron() {
+
     await this.githubService.checkForUpdates();
   }
 

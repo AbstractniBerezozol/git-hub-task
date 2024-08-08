@@ -157,6 +157,7 @@ describe('GithubIneractionService', () => {
         username: 'Coco',
         password: 'Coco123',
         email: 'Coco@singimail.rs',
+        roles: ['default'],
         repositories: [],
       };
       const mockRepoId = 12345;
@@ -195,6 +196,7 @@ describe('GithubIneractionService', () => {
         username: 'Coco',
         password: 'Coco123',
         email: 'Coco@singimail.rs',
+        roles: ['default'],
         repositories: [],
       };
       const mockRepoId = 12345;
@@ -220,6 +222,7 @@ describe('GithubIneractionService', () => {
           username: 'Coco',
           password: 'Coco123',
           email: 'Coco@singimail.rs',
+          roles: ['default'],
           repositories: [],
         },
         name: '',
@@ -268,7 +271,8 @@ describe('GithubIneractionService', () => {
         username: 'Coco',
         password: 'Coco123',
         email: 'Coco@singimail.rs',
-        repositories: [mockedRepository],
+        roles: ['default'],
+        repositories: [],
       };
       mockRepository.find.mockResolvedValue(mockUser.repositories);
 
@@ -336,6 +340,7 @@ describe('GithubIneractionService', () => {
         username: 'Coco',
         password: 'Coco123',
         email: 'Coco@singimail.rs',
+        roles: ['default'],
         repositories: [],
       };
       const mockedRepository: GitRepository = {
@@ -427,7 +432,8 @@ describe('GithubIneractionService', () => {
         username: 'Coco',
         password: 'Coco123',
         email: 'Coco@singimail.rs',
-        repositories: [mockedRepository],
+        roles: ['default'],
+        repositories: [],
       };
       const mockUsers: User[] = [mockUser];
       const mockSummary = '- mockingRepository ';

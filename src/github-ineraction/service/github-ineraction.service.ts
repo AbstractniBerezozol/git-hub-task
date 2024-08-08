@@ -30,12 +30,6 @@ export class GithubIneractionService {
     });
   }
 
-  // async userWithNoPassword(username: string) {
-  //   const user = this.getUser(username);
-  //   (await user).password = '123';
-  //   return user;
-  // }
-
   async searchRepositories(
     searchBy: SearchBy,
     name: string,
@@ -109,7 +103,7 @@ export class GithubIneractionService {
         user,
       });
 
-     await this.gitRepository.save(newRepo);
+      await this.gitRepository.save(newRepo);
 
       return this.gitRepository.find({
         where: { user: { username: user.username } },
@@ -136,28 +130,35 @@ export class GithubIneractionService {
 
   async getLatestReliase(gitRepository: GitRepository) {
     const token = this.configService.get<string>('GITHUB_TOKEN');
+
     const headers = {
       Authorization: `token ${token}`,
     };
+    // if (gitRepository.latestRelease == null) {
+    //   const lastRelease = 'SomeString';
+    //   gitRepository.latestRelease = lastRelease;
+    // }
     try {
       const response = await firstValueFrom(
         this.httpService.get(
-          `${this.githubApiUrl}/repos/${gitRepository.full_name}/latest`,
+          `${this.githubApiUrl}/repos/${gitRepository.full_name}/releases/latest`,
           {
             headers,
           },
         ),
       );
+      
       return response.data.name;
     } catch (error) {
       console.log(
-        `For repository ${gitRepository.repoId} latest reliase is not found`,
+        `For repository ${gitRepository.full_name} latest reliase is not found`,
       );
     }
   }
 
   async checkForUpdates() {
     const repositories = await this.gitRepository.find({ relations: ['user'] });
+    console.log('hey');
     for (const repo of repositories) {
       const release = await this.getLatestReliase(repo);
       if (repo.latestRelease != release) {

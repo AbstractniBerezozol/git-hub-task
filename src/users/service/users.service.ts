@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { CreateUserDto } from '../domain/dto/create-user.dto';
 import { UpdateUserDto } from '../domain/dto/update-user.dto';
+import { UserRole } from '../domain/enum/roles.enum';
 
 
 @Injectable()
@@ -54,10 +55,12 @@ export class UsersService {
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
     const username = createUserDto.username;
     const email = createUserDto.email;
+    const roles = createUserDto.roles;
     const newUser = this.userRepository.create({
       username,
       email,
       password: hashedPassword,
+      roles: roles || [UserRole.USER],
     });
     return this.userRepository.save(newUser);
   }
