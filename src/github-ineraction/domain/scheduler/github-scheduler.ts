@@ -8,7 +8,6 @@ export class GitHubScheduler {
 
   @Cron(CronExpression.EVERY_10_SECONDS)
   async handleCron() {
-
     await this.githubService.checkForUpdates();
   }
 

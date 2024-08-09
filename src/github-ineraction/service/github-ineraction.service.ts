@@ -134,10 +134,6 @@ export class GithubIneractionService {
     const headers = {
       Authorization: `token ${token}`,
     };
-    // if (gitRepository.latestRelease == null) {
-    //   const lastRelease = 'SomeString';
-    //   gitRepository.latestRelease = lastRelease;
-    // }
     try {
       const response = await firstValueFrom(
         this.httpService.get(
@@ -147,7 +143,7 @@ export class GithubIneractionService {
           },
         ),
       );
-      
+
       return response.data.name;
     } catch (error) {
       console.log(
@@ -158,7 +154,6 @@ export class GithubIneractionService {
 
   async checkForUpdates() {
     const repositories = await this.gitRepository.find({ relations: ['user'] });
-    console.log('hey');
     for (const repo of repositories) {
       const release = await this.getLatestReliase(repo);
       if (repo.latestRelease != release) {
