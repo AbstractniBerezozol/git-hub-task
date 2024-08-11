@@ -7,13 +7,10 @@ import { EmailService } from '../../email/service/email.service';
 import { User } from '../../users/domain/entity/user.entity';
 import { GitRepository } from '../domain/entity/repository.entity';
 import { GithubIneractionService } from '../service/github-ineraction.service';
-import { name } from 'ejs';
 import { SearchBy } from '../domain/enum/repository.enum';
 import { HttpException } from '@nestjs/common';
-import exp from 'constants';
-import { rejects } from 'assert';
 import { of } from 'rxjs';
-import { error } from 'console';
+
 
 const mockHttpService = {
   get: jest.fn(),

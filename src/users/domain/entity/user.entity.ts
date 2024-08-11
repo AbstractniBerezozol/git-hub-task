@@ -2,10 +2,8 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   Column,
   Entity,
-  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
-  Repository,
   Unique,
 } from 'typeorm';
 import { GitRepository } from '../../../github-ineraction/domain/entity/repository.entity';

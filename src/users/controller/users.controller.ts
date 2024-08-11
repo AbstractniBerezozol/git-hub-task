@@ -1,8 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { UsersService } from '../service/users.service';
 import { UpdateUserDto } from '../domain/dto/update-user.dto';
-
 
 @ApiTags('users')
 @Controller('users')
@@ -26,7 +33,10 @@ export class UsersController {
   }
 
   @Patch(':username')
-  update(@Param('username') username: string, @Body() updateUserDto: UpdateUserDto) {
+  update(
+    @Param('username') username: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
     return this.usersService.update(username, updateUserDto);
   }
 

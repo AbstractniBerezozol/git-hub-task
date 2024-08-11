@@ -4,8 +4,6 @@ import * as bcrypt from 'bcryptjs';
 import { UnauthorizedException } from '@nestjs/common';
 import { User } from '../../users/domain/entity/user.entity';
 import { UsersService } from '../../users/service/users.service';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { create } from 'domain';
 import { AuthService } from '../service/auth.service';
 import { CreateUserDto } from '../../users/domain/dto/create-user.dto';
 
@@ -82,6 +80,7 @@ describe('AuthService', () => {
         username: 'Coco',
         password: 'Coco123',
         email: 'Coco@gmail.com',
+        roles: []
       };
       const expectedUser = { ...createUserDto, id: 2 };
       mockUserService.create.mockResolvedValue(expectedUser);

@@ -7,7 +7,6 @@ import { CreateUserDto } from '../domain/dto/create-user.dto';
 import { UpdateUserDto } from '../domain/dto/update-user.dto';
 import { UserRole } from '../domain/enum/roles.enum';
 
-
 @Injectable()
 export class UsersService {
   constructor(

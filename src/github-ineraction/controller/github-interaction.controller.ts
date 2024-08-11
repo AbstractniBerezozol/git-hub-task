@@ -10,9 +10,6 @@ import {
   Body,
 } from '@nestjs/common';
 import { GithubIneractionService } from '../service/github-ineraction.service';
-import { query } from 'express';
-import { Repository } from 'typeorm';
-
 import { SearchBy } from '../domain/enum/repository.enum';
 import { ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../auth/guards/jwt.guard';
