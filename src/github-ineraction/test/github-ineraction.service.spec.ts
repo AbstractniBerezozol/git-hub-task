@@ -429,7 +429,7 @@ describe('GithubIneractionService', () => {
         username: 'Coco',
         password: 'Coco123',
         email: 'Coco@singimail.rs',
-        roles: ['default'],
+        roles: ['user'],
         repositories: [],
       };
       const mockUsers: User[] = [mockUser];

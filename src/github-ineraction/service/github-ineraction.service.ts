@@ -23,12 +23,12 @@ export class GithubIneractionService {
     private readonly gitRepository: Repository<GitRepository>,
   ) {}
 
-  // async getUser(username: string): Promise<User> {
-  //   return this.userRep.findOneOrFail({
-  //     where: { username },
-  //     relations: ['repositories'],
-  //   });
-  // }
+  async getUser(username: string): Promise<User> {
+    return this.userRep.findOneOrFail({
+      where: { username },
+      relations: ['repositories'],
+    });
+  }
 
   async searchRepositories(
     searchBy: SearchBy,
