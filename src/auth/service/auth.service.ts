@@ -14,7 +14,6 @@ export class AuthService {
 
   async login({ username, password }: AuthPayloadDto) {
     const user = await this.userService.findOne(username);
-    console.log({ user });
     if (!user) {
       throw new UnauthorizedException();
     }

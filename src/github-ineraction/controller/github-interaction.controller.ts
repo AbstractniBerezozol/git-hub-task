@@ -1,21 +1,22 @@
 import {
   Controller,
+  Delete,
   Get,
   Param,
-  Query,
-  UseGuards,
-  Request,
   Post,
-  Delete,
-  Body,
+  Query,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
-import { GithubIneractionService } from '../service/github-ineraction.service';
-import { SearchBy } from '../domain/enum/repository.enum';
 import { ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../../auth/guards/jwt.guard';
+import { Roles } from '../../auth/domain/decorator/roles.decorator';
+import { LocalAuthGuard } from '../../auth/guards/local-auth.guard';
 import { GitRepository } from '../domain/entity/repository.entity';
+import { SearchBy } from '../domain/enum/repository.enum';
+import { GithubIneractionService } from '../service/github-ineraction.service';
+import { RolesGuard } from '../../auth/guards/roles.guard';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(LocalAuthGuard)
 @ApiTags('github-interaction')
 @Controller('github-interaction')
 export class GithubInteractionController {
@@ -27,38 +28,34 @@ export class GithubInteractionController {
     @Param('value') value: string,
     @Query('owner') owner: string,
   ) {
-    console.log(value);
-    console.log(searchBy);
-    console.log(owner);
     return this.githubService.searchRepositories(searchBy, value, owner);
+  }
+
+  @UseGuards(RolesGuard)
+  @Get('watchlist')
+  @Roles(['admin'])
+  async getWatchlist(@Request() req): Promise<GitRepository[]> {
+    return this.githubService.getWatchlist(req.user);
+  }
+
+  @UseGuards(RolesGuard)
+  @Get('sendTestEmail')
+  @Roles(['admin', 'moderator'])
+  async sendEmail(@Query('email') email: string) {
+    email = 'aleksandr.zolotarev@abstract.rs';
+    return this.githubService.sendMonthSummary();
   }
 
   @Post('add-repository/:repoId')
   async addRepositoryToWatchlist(
     @Param('repoId') repoId: number,
-    @Body('username') username: string,
+    @Request() req,
   ) {
-    console.log('Here');
-    const user = await this.githubService.getUser(username);
-    return this.githubService.addRepository(repoId, user);
+    return this.githubService.addRepository(repoId, req.user);
   }
 
   @Delete('delete-repository/:repoId')
-  async deleteRepository(
-    @Param('repoId') repoId: number,
-    @Body('username') username: string,
-  ) {
-    const user = await this.githubService.getUser(username);
+  async deleteRepository(@Param('repoId') repoId: number) {
     return this.githubService.deleteRepository(repoId);
-  }
-  @Get('watchlist')
-  async getWatchlist(@Request() req): Promise<GitRepository[]> {
-    return this.githubService.getWatchlist(req.user);
-  }
-
-  @Get('sendTestEmail')
-  async sendEmail(@Query('email') email: string) {
-    email = 'aleksandr.zolotarev@abstract.rs';
-    return this.githubService.sendMonthSummary();
   }
 }

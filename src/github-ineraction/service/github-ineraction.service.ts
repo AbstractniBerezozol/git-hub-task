@@ -23,12 +23,12 @@ export class GithubIneractionService {
     private readonly gitRepository: Repository<GitRepository>,
   ) {}
 
-  async getUser(username: string): Promise<User> {
-    return this.userRep.findOneOrFail({
-      where: { username },
-      relations: ['repositories'],
-    });
-  }
+  // async getUser(username: string): Promise<User> {
+  //   return this.userRep.findOneOrFail({
+  //     where: { username },
+  //     relations: ['repositories'],
+  //   });
+  // }
 
   async searchRepositories(
     searchBy: SearchBy,
@@ -36,11 +36,9 @@ export class GithubIneractionService {
     owner: string,
   ): Promise<any> {
     let query: string;
-    console.log(searchBy);
 
     switch (searchBy) {
       case SearchBy.name:
-        console.log(searchBy);
         query = `name:${name}`;
         break;
 
@@ -63,7 +61,6 @@ export class GithubIneractionService {
       default:
         throw new BadRequestException('Something went wrong');
     }
-    console.log(query);
 
     const url = `${this.githubApiUrl}/search/repositories?q=${query}`;
     try {
@@ -125,7 +122,11 @@ export class GithubIneractionService {
   }
 
   async getWatchlist(user: User): Promise<GitRepository[]> {
-    return this.gitRepository.find({ where: { user: user } });
+    return this.gitRepository
+      .createQueryBuilder('git_repository')
+      .innerJoin('git_repository.user', 'user')
+      .where('user.username= :username', {username: user.username})
+      .getMany();
   }
 
   async getLatestReliase(gitRepository: GitRepository) {
@@ -176,7 +177,6 @@ export class GithubIneractionService {
   }
 
   async testEmailing(email: string) {
-    console.log(email);
     await this.emailService.sendTest(email);
   }
 }
