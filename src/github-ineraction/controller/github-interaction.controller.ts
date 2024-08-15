@@ -15,6 +15,7 @@ import { GitRepository } from '../domain/entity/repository.entity';
 import { SearchBy } from '../domain/enum/repository.enum';
 import { GithubIneractionService } from '../service/github-ineraction.service';
 import { RolesGuard } from '../../auth/guards/roles.guard';
+import { UserRole } from '../../users/domain/enum/roles.enum';
 
 @UseGuards(LocalAuthGuard)
 @ApiTags('github-interaction')
@@ -33,14 +34,14 @@ export class GithubInteractionController {
 
   @UseGuards(RolesGuard)
   @Get('watchlist')
-  @Roles(['admin'])
+  @Roles([UserRole.ADMIN])
   async getWatchlist(@Request() req): Promise<GitRepository[]> {
     return this.githubService.getWatchlist(req.user);
   }
 
   @UseGuards(RolesGuard)
   @Get('sendTestEmail')
-  @Roles(['admin', 'moderator'])
+  @Roles([UserRole.ADMIN, UserRole.MODERATOR])
   async sendEmail(@Query('email') email: string) {
     email = 'aleksandr.zolotarev@abstract.rs';
     return this.githubService.sendMonthSummary();

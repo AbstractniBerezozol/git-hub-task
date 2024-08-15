@@ -15,7 +15,7 @@ export class EmailService {
     });
   }
 
-  async sendMounthSummary(userEmail: string, summary: string) {
+  async sendMonthSummary(userEmail: string, summary: string) {
     const subject = 'Here is your month summary';
     const text = `Hello, please, here is your monthly summary activity:\n\n${summary}`;
     await this.mailerService.sendMail({
@@ -25,14 +25,5 @@ export class EmailService {
     });
   }
 
-  async sendTest(email: string) {
-    console.log(email);
-    const subject = 'Here here here';
-    const text = `Hello, please, here is your death`;
-    await this.mailerService.sendMail({
-      to: email,
-      subject: subject,
-      text: text,
-    });
-  }
+
 }

@@ -11,7 +11,6 @@ import { SearchBy } from '../domain/enum/repository.enum';
 import { HttpException } from '@nestjs/common';
 import { of } from 'rxjs';
 
-
 const mockHttpService = {
   get: jest.fn(),
 };
@@ -35,11 +34,12 @@ const mockRepository = {
   find: jest.fn(),
   remove: jest.fn(),
   findOneOrFail: jest.fn(),
+  createQueryBuilder: jest.fn(),
 };
 
 const mockEmailService = {
   sendNotification: jest.fn(),
-  sendMounthSummary: jest.fn(),
+  sendMonthSummary: jest.fn(),
 };
 describe('GithubIneractionService', () => {
   let githubInteractionService: GithubIneractionService;
@@ -82,35 +82,6 @@ describe('GithubIneractionService', () => {
 
   it('should be defined', () => {
     expect(githubInteractionService).toBeDefined();
-  });
-
-  describe('getUser', () => {
-    it('should return a user', async () => {
-      const mockUser = {
-        id: 1,
-        username: 'Coco',
-        password: 'Coco123',
-        email: 'Coco@singimail.rs',
-        repositories: [],
-      };
-      mockRepository.findOneOrFail.mockResolvedValue(mockUser);
-
-      const result = await githubInteractionService.getUser('Coco');
-      expect(result).toEqual(mockUser);
-      expect(mockRepository.findOneOrFail).toHaveBeenCalledWith({
-        where: { username: 'Coco' },
-        relations: ['repositories'],
-      });
-    });
-    it('should throw an error if user is not found', async () => {
-      mockRepository.findOneOrFail.mockImplementation(() => {
-        throw new Error();
-      });
-
-      await expect(
-        githubInteractionService.getUser('Coco23'),
-      ).rejects.toThrowError();
-    });
   });
 
   describe('searchRepositories', () => {
@@ -270,14 +241,41 @@ describe('GithubIneractionService', () => {
         email: 'Coco@singimail.rs',
         roles: ['default'],
         repositories: [],
+      } as User;
+
+      const queryBuilder: any = {
+        innerJoin: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue(mockedRepository),
       };
-      mockRepository.find.mockResolvedValue(mockUser.repositories);
+
+      jest
+        .spyOn(gitRepository, 'createQueryBuilder')
+        .mockReturnValue(queryBuilder);
 
       const result = await githubInteractionService.getWatchlist(mockUser);
-      expect(result).toEqual(mockUser.repositories);
-      expect(mockRepository.find).toHaveBeenCalledWith({
-        where: { user: mockUser },
-      });
+
+      expect(gitRepository.createQueryBuilder).toHaveBeenCalledWith(
+        'git_repository',
+      );
+      expect(queryBuilder.innerJoin).toHaveBeenCalledWith(
+        'git_repository.user',
+        'user',
+      );
+      expect(queryBuilder.where).toHaveBeenCalledWith(
+        'user.username= :username',
+        { username: mockUser.username },
+      );
+      expect(queryBuilder.getMany).toHaveBeenCalled();
+      expect(result).toEqual(mockedRepository);
+
+      // mockRepository.find.mockResolvedValue(mockUser.repositories);
+
+      // const result = await githubInteractionService.getWatchlist(mockUser);
+      // expect(result).toEqual(mockUser.repositories);
+      // expect(mockRepository.find).toHaveBeenCalledWith({
+      //   where: { user: mockUser },
+      // });
     });
   });
 
@@ -429,15 +427,17 @@ describe('GithubIneractionService', () => {
         username: 'Coco',
         password: 'Coco123',
         email: 'Coco@singimail.rs',
-        roles: ['user'],
-        repositories: [],
+        roles: ['default'],
+        repositories: [mockedRepository],
       };
       const mockUsers: User[] = [mockUser];
       const mockSummary = '- mockingRepository ';
       mockRepository.find.mockResolvedValue(mockUsers);
 
+      console.log(mockSummary);
+
       await githubInteractionService.sendMonthSummary();
-      expect(mockEmailService.sendMounthSummary).toHaveBeenCalledWith(
+      expect(mockEmailService.sendMonthSummary).toHaveBeenCalledWith(
         mockUser.email,
         mockSummary,
       );

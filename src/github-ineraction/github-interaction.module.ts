@@ -8,19 +8,23 @@ import { User } from '../users/domain/entity/user.entity';
 import { GitRepository } from './domain/entity/repository.entity';
 import { GitHubScheduler } from './domain/scheduler/github-scheduler';
 import { JwtModule } from '@nestjs/jwt';
-import { UsersModule } from '../users/users.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, GitRepository]),    JwtModule.registerAsync({
-    imports: [ConfigModule],
-    useFactory: async (configService: ConfigService) => ({
-      secret: configService.get<string>('JWT_SECRET'),
-      signOptions: { expiresIn: '1h' },
+  imports: [
+    TypeOrmModule.forFeature([User, GitRepository]),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: { expiresIn: '1h' },
+      }),
+      inject: [ConfigService],
     }),
-    inject:[ConfigService]
-  }), HttpModule, EmailModule],
+    HttpModule,
+    EmailModule,
+  ],
   controllers: [GithubInteractionController],
-  providers: [GithubIneractionService,GitHubScheduler],
+  providers: [GithubIneractionService, GitHubScheduler],
 })
 export class GithubInteractionModule {}

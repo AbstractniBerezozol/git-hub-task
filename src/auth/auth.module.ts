@@ -19,7 +19,7 @@ import { AuthService } from './service/auth.service';
         secret: configService.get<string>('JWT_SECRET'),
         signOptions: { expiresIn: '1h' },
       }),
-      inject:[ConfigService]
+      inject: [ConfigService],
     }),
     UsersModule,
     TypeOrmModule.forFeature([User]),

@@ -23,13 +23,6 @@ export class GithubIneractionService {
     private readonly gitRepository: Repository<GitRepository>,
   ) {}
 
-  async getUser(username: string): Promise<User> {
-    return this.userRep.findOneOrFail({
-      where: { username },
-      relations: ['repositories'],
-    });
-  }
-
   async searchRepositories(
     searchBy: SearchBy,
     name: string,
@@ -125,7 +118,7 @@ export class GithubIneractionService {
     return this.gitRepository
       .createQueryBuilder('git_repository')
       .innerJoin('git_repository.user', 'user')
-      .where('user.username= :username', {username: user.username})
+      .where('user.username= :username', { username: user.username })
       .getMany();
   }
 
@@ -172,11 +165,7 @@ export class GithubIneractionService {
       const summary = user.repositories
         .map((repo) => `- ${repo.name} `)
         .join('\n');
-      await this.emailService.sendMounthSummary(user.email, summary);
+      await this.emailService.sendMonthSummary(user.email, summary);
     }
-  }
-
-  async testEmailing(email: string) {
-    await this.emailService.sendTest(email);
   }
 }

@@ -13,6 +13,7 @@ import { UsersService } from '../service/users.service';
 import { UpdateUserDto } from '../domain/dto/update-user.dto';
 import { Roles } from '../../auth/domain/decorator/roles.decorator';
 import { JwtAuthGuard } from '../../auth/guards/jwt.guard';
+import { UserRole } from '../domain/enum/roles.enum';
 
 @UseGuards(JwtAuthGuard)
 @ApiTags('users')
@@ -43,7 +44,7 @@ export class UsersController {
     return this.usersService.update(username, updateUserDto);
   }
 
-  @Roles(['admin'])
+  @Roles([UserRole.ADMIN])
   @Delete(':username')
   remove(@Param('username') username: string) {
     return this.usersService.remove(username);

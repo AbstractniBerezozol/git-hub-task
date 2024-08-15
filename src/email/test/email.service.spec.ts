@@ -42,7 +42,7 @@ describe('EmailService', () => {
     const userMail = 'aleksandr.zolotarev@abstract.rs';
     const summary = 'Hello, please, here is your monthly summary activity';
 
-    await emailService.sendMounthSummary(userMail, summary);
+    await emailService.sendMonthSummary(userMail, summary);
 
     expect(mailerService.sendMail).toHaveBeenCalledWith({
       to: userMail,

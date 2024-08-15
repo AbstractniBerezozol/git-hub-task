@@ -7,7 +7,6 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 
-
 @Injectable()
 export class LocalAuthGuard implements CanActivate {
   constructor(private jwtService: JwtService) {}
@@ -24,7 +23,6 @@ export class LocalAuthGuard implements CanActivate {
       });
       request['user'] = payload;
     } catch {
-      console.log('Here');
       throw new UnauthorizedException();
     }
     return true;
