@@ -1,13 +1,13 @@
 import { HttpService } from '@nestjs/axios';
 import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, from, lastValueFrom } from 'rxjs';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SearchBy } from '../domain/enum/repository.enum';
 import { GitRepository } from '../domain/entity/repository.entity';
 import { User } from '../../users/domain/entity/user.entity';
-import { EmailService } from '../../email/service/email.service';
+import { EmailData } from '../domain/interface/email.interface';
 
 @Injectable()
 export class GithubIneractionService {
@@ -16,7 +16,6 @@ export class GithubIneractionService {
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
-    private readonly emailService: EmailService,
     @InjectRepository(User)
     private readonly userRep: Repository<User>,
     @InjectRepository(GitRepository)
@@ -153,8 +152,16 @@ export class GithubIneractionService {
       if (repo.latestRelease != release) {
         repo.latestRelease = release;
         this.gitRepository.save(repo);
+        const subject = 'Here is update from your list!';
+        const text = `Hello, it is update ${repo.name} from your Watchlist!!!`;
+        const letter = {
+          from: 'aleksander.zolotarev@abstract.rs',
+          to: repo.user.email,
+          subject: subject,
+          text: text,
+        };
 
-        this.emailService.sendNotification(repo.user.email, repo.name);
+        await this.sendDataToAnotherApi(letter);
       }
     }
   }
@@ -165,7 +172,21 @@ export class GithubIneractionService {
       const summary = user.repositories
         .map((repo) => `- ${repo.name} `)
         .join('\n');
-      await this.emailService.sendMonthSummary(user.email, summary);
+      const subject = 'Here is your month summary';
+      const text = `Hello, please, here is your monthly summary activity:\n\n${summary}`;
+      const letter = {
+        from: 'aleksander.zolotarev@abstract.rs',
+        to: user.email,
+        subject: subject,
+        text: text,
+      };
+      await this.sendDataToAnotherApi(letter);
     }
+  }
+
+  async sendDataToAnotherApi(data: EmailData): Promise<string> {
+    const url = 'http://localhost:3001/sendingTestingEmail/messageRequest';
+    const response = this.httpService.post(url, data);
+    return lastValueFrom(response).then((res) => res.data);
   }
 }

@@ -3,7 +3,6 @@ import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { EmailService } from '../../email/service/email.service';
 import { User } from '../../users/domain/entity/user.entity';
 import { GitRepository } from '../domain/entity/repository.entity';
 import { GithubIneractionService } from '../service/github-ineraction.service';
@@ -45,7 +44,6 @@ describe('GithubIneractionService', () => {
   let githubInteractionService: GithubIneractionService;
   let httpService: HttpService;
   let configService: ConfigService;
-  let emailService: EmailService;
   let userRepostory: Repository<User>;
   let gitRepository: Repository<GitRepository>;
 
@@ -55,7 +53,6 @@ describe('GithubIneractionService', () => {
         GithubIneractionService,
         { provide: HttpService, useValue: mockHttpService },
         { provide: ConfigService, useValue: mockConfigService },
-        { provide: EmailService, useValue: mockEmailService },
         { provide: getRepositoryToken(User), useValue: mockRepository },
         {
           provide: getRepositoryToken(GitRepository),
@@ -69,7 +66,6 @@ describe('GithubIneractionService', () => {
     );
     httpService = module.get<HttpService>(HttpService);
     configService = module.get<ConfigService>(ConfigService);
-    emailService = module.get<EmailService>(EmailService);
     userRepostory = module.get<Repository<User>>(getRepositoryToken(User));
     gitRepository = module.get<Repository<GitRepository>>(
       getRepositoryToken(GitRepository),
