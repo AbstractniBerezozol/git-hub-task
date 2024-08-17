@@ -8,10 +8,14 @@ import { GitRepository } from '../domain/entity/repository.entity';
 import { GithubIneractionService } from '../service/github-ineraction.service';
 import { SearchBy } from '../domain/enum/repository.enum';
 import { HttpException } from '@nestjs/common';
-import { of } from 'rxjs';
+import { of, Subject } from 'rxjs';
+import { relative } from 'path';
+import exp from 'constants';
+import { EmailData } from '../domain/interface/email.interface';
 
 const mockHttpService = {
   get: jest.fn(),
+  post: jest.fn(),
 };
 
 enum mockSearchBy {
@@ -36,10 +40,6 @@ const mockRepository = {
   createQueryBuilder: jest.fn(),
 };
 
-const mockEmailService = {
-  sendNotification: jest.fn(),
-  sendMonthSummary: jest.fn(),
-};
 describe('GithubIneractionService', () => {
   let githubInteractionService: GithubIneractionService;
   let httpService: HttpService;
@@ -325,7 +325,7 @@ describe('GithubIneractionService', () => {
   });
 
   describe('checkForUpdates', () => {
-    it('should check for updates and notify is it was updated', async () => {
+    it('should notify if updates were found', async () => {
       const mockUser = {
         id: 1,
         username: 'Coco',
@@ -333,7 +333,62 @@ describe('GithubIneractionService', () => {
         email: 'Coco@singimail.rs',
         roles: ['default'],
         repositories: [],
-      };
+      } as User;
+      const mockedRepository: GitRepository = {
+        id: 1,
+        name: 'mockingRepository',
+        full_name: 'alexander/mockingRepository',
+        html_url: 'https://github.com/alexander/mockingRepository',
+        description: 'Here is test repository for something incredible',
+        language: 'TypeScript',
+        stargazers_count: 103,
+        watchers_count: 6,
+        forks_count: 10509,
+        latestRelease: 'v1.7.19',
+        repoId: 23,
+        user: mockUser,
+      } as GitRepository;
+      mockUser.repositories = [mockedRepository];
+
+      jest.spyOn(gitRepository, 'find').mockResolvedValue([mockedRepository]);
+      jest
+        .spyOn(githubInteractionService, 'getLatestReliase')
+        .mockResolvedValue('v1.7.20');
+      const saveSpy = jest
+        .spyOn(gitRepository, 'save')
+        .mockResolvedValue(mockedRepository);
+
+      const sendDataSpy = jest
+        .spyOn(githubInteractionService, 'sendDataToAnotherApi')
+        .mockResolvedValue('OK');
+
+      await githubInteractionService.checkForUpdates();
+
+      expect(gitRepository.find).toHaveBeenCalledWith({ relations: ['user'] });
+      expect(
+        githubInteractionService.getLatestReliase,
+      ).toHaveBeenLastCalledWith(mockedRepository);
+      expect(saveSpy).toHaveBeenCalledWith({
+        ...mockRepository,
+        latestReliase: 'v1.7.20',
+      });
+      expect(sendDataSpy).toHaveBeenCalledWith({
+        from: 'aleksandr.zolotarev@abstract.rs',
+        to: mockUser.email,
+        subject: 'Here is update from your list!',
+        text: 'Hello there!!! Here is your update!',
+      });
+    });
+
+    it('should not notify if updates were not found', async () => {
+      const mockUser = {
+        id: 1,
+        username: 'Coco',
+        password: 'Coco123',
+        email: 'Coco@singimail.rs',
+        roles: ['default'],
+        repositories: [],
+      } as User;
       const mockedRepository: GitRepository = {
         id: 1,
         name: 'mockingRepository',
@@ -350,56 +405,27 @@ describe('GithubIneractionService', () => {
       };
       mockUser.repositories = [mockedRepository];
 
-      mockRepository.find.mockResolvedValue([mockUser.repositories[0]]);
-      const mockResponse = { data: { name: 'v2.14.78' } };
-      mockHttpService.get.mockResolvedValue(mockResponse);
+      jest.spyOn(gitRepository, 'find').mockResolvedValue([mockedRepository]);
+      jest
+        .spyOn(githubInteractionService, 'getLatestReliase')
+        .mockResolvedValue('v1.7.19');
+      const saveSpy = jest
+        .spyOn(gitRepository, 'save')
+        .mockResolvedValue(mockedRepository);
+
+      const sendDataSpy = jest
+        .spyOn(githubInteractionService, 'sendDataToAnotherApi')
+        .mockResolvedValue('OK');
 
       await githubInteractionService.checkForUpdates();
-      expect(mockRepository.save).toHaveBeenCalled();
-      expect(mockEmailService.sendNotification).toHaveBeenCalledWith(
-        mockUser.email,
-        mockedRepository.name,
+
+      expect(gitRepository.find).toHaveBeenCalledWith({ relations: ['user'] });
+      expect(githubInteractionService.getLatestReliase).toHaveBeenCalledWith(
+        mockedRepository,
       );
+      expect(saveSpy).not.toHaveBeenCalled();
+      expect(sendDataSpy).not.toHaveBeenCalled();
     });
-
-    it('should not notify if it was not updated', async () => {
-      const mockedRepository: GitRepository = {
-        id: 1,
-        name: 'mockingRepository',
-        full_name: 'alexander/mockingRepository',
-        html_url: 'https://github.com/alexander/mockingRepository',
-        description: 'Here is test repository for something incredible',
-        language: 'TypeScript',
-        stargazers_count: 103,
-        watchers_count: 6,
-        forks_count: 10509,
-        latestRelease: 'v1.7.19',
-        repoId: 23,
-        user: new User(),
-      };
-      const mockUser = {
-        id: 1,
-        username: 'Coco',
-        password: 'Coco123',
-        email: 'Coco@singimail.rs',
-        repositories: [mockedRepository],
-      };
-
-      mockRepository.find.mockResolvedValue([mockUser]);
-      const mockResponse = { data: { name: 'v1.7.19' } };
-      mockHttpService.get.mockResolvedValue(mockResponse);
-
-      await githubInteractionService.checkForUpdates();
-      expect(mockRepository.save).not.toHaveBeenCalled();
-      expect(mockEmailService.sendNotification).not.toHaveBeenCalled();
-    });
-    // it('should handle all errors during update check', async () => {
-    //   mockRepository.find.mockRejectedValue(HttpException);
-
-    //   await expect(
-    //     githubInteractionService.checkForUpdates(),
-    //   ).rejects.toThrowError(HttpException);
-    // });
   });
 
   describe('sendMonthSummary', () => {
@@ -427,16 +453,22 @@ describe('GithubIneractionService', () => {
         repositories: [mockedRepository],
       };
       const mockUsers: User[] = [mockUser];
-      const mockSummary = '- mockingRepository ';
-      mockRepository.find.mockResolvedValue(mockUsers);
-
-      console.log(mockSummary);
+      jest.spyOn(userRepostory, 'find').mockResolvedValue([mockUser]);
+      const sendDataSpy = jest
+        .spyOn(githubInteractionService, 'sendDataToAnotherApi')
+        .mockResolvedValue('OK');
 
       await githubInteractionService.sendMonthSummary();
-      expect(mockEmailService.sendMonthSummary).toHaveBeenCalledWith(
-        mockUser.email,
-        mockSummary,
-      );
+
+      expect(userRepostory.find).toHaveBeenCalledWith({
+        relations: ['repositories'],
+      });
+      expect(sendDataSpy).toHaveBeenCalledWith({
+        from: 'aleksandr.zolotarev@abstract.rs',
+        to: mockUser.email,
+        subject: 'Here is update from your list!',
+        text: 'Hello there!!! Here is your update!',
+      });
     });
 
     it('should handle errors during summary sending', async () => {
@@ -445,6 +477,26 @@ describe('GithubIneractionService', () => {
       await expect(
         githubInteractionService.sendMonthSummary(),
       ).rejects.toThrowError(Error);
+    });
+  });
+
+  describe('sendDataToAnotherApi', () => {
+    it('should send data to another API and returns response', async () => {
+      const mockData: EmailData = {
+        from: 'aleksandr.zolotarev@abstract.rs',
+        to: 'Testing@gmail.com',
+        subject: 'Here is update from your list!',
+        text: 'Hello there!!! Here is your update!',
+      };
+
+      const mockResponse = {data: 'Success'};
+
+      jest.spyOn(httpService, 'post').mockReturnValue(of(mockResponse));
+
+      const result = await githubInteractionService.sendDataToAnotherApi(mockData);
+
+      expect(httpService.post).toHaveBeenCalledWith('http://localhost:3001/sendingTestingEmail/messageRequest', mockData);
+      expect(result).toBe('Success');
     });
   });
 });

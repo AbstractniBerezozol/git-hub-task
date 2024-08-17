@@ -5,7 +5,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { HttpModule } from '@nestjs/axios';
 import { GithubInteractionModule } from './github-ineraction/github-interaction.module';
-import { EmailModule } from './email/email.module';
 import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
@@ -30,7 +29,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     ConfigModule.forRoot({ isGlobal: true }),
     HttpModule,
     ScheduleModule.forRoot(),
-    EmailModule,
+    
   ],
   controllers: [],
   providers: [],

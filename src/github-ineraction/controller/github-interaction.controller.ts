@@ -55,7 +55,7 @@ export class GithubInteractionController {
 
   @Post('sendDataToAnotherApi')
   async sendToAnotherApiData() {
-    return this.githubService.sendMonthSummary();
+    return this.githubService.checkForUpdates();
   }
 
   @Post('add-repository/:repoId')
