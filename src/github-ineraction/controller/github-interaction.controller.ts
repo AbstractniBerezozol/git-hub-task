@@ -1,5 +1,4 @@
 import {
-  Body,
   Controller,
   Delete,
   Get,
@@ -18,16 +17,11 @@ import { GithubIneractionService } from '../service/github-ineraction.service';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { UserRole } from '../../users/domain/enum/roles.enum';
 
-
-
 @UseGuards(LocalAuthGuard)
 @ApiTags('github-interaction')
 @Controller('github-interaction')
 export class GithubInteractionController {
-  constructor(
-    private readonly githubService: GithubIneractionService,
-
-  ) {}
+  constructor(private readonly githubService: GithubIneractionService) {}
 
   @Get('search/repos/:value')
   async searchRepositories(

@@ -8,9 +8,7 @@ import { GitRepository } from '../domain/entity/repository.entity';
 import { GithubIneractionService } from '../service/github-ineraction.service';
 import { SearchBy } from '../domain/enum/repository.enum';
 import { HttpException } from '@nestjs/common';
-import { of, Subject } from 'rxjs';
-import { relative } from 'path';
-import exp from 'constants';
+import { of } from 'rxjs';
 import { EmailData } from '../domain/interface/email.interface';
 import { AxiosResponse } from 'axios';
 

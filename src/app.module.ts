@@ -29,7 +29,6 @@ import { ScheduleModule } from '@nestjs/schedule';
     ConfigModule.forRoot({ isGlobal: true }),
     HttpModule,
     ScheduleModule.forRoot(),
-    
   ],
   controllers: [],
   providers: [],
