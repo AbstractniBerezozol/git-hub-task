@@ -12,6 +12,7 @@ import { of, Subject } from 'rxjs';
 import { relative } from 'path';
 import exp from 'constants';
 import { EmailData } from '../domain/interface/email.interface';
+import { AxiosResponse } from 'axios';
 
 const mockHttpService = {
   get: jest.fn(),
@@ -48,6 +49,7 @@ describe('GithubIneractionService', () => {
   let gitRepository: Repository<GitRepository>;
 
   beforeEach(async () => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         GithubIneractionService,
@@ -369,14 +371,14 @@ describe('GithubIneractionService', () => {
         githubInteractionService.getLatestReliase,
       ).toHaveBeenLastCalledWith(mockedRepository);
       expect(saveSpy).toHaveBeenCalledWith({
-        ...mockRepository,
-        latestReliase: 'v1.7.20',
+        ...mockedRepository,
+        latestRelease: 'v1.7.20',
       });
       expect(sendDataSpy).toHaveBeenCalledWith({
         from: 'aleksandr.zolotarev@abstract.rs',
         to: mockUser.email,
         subject: 'Here is update from your list!',
-        text: 'Hello there!!! Here is your update!',
+        text: `Hello, it is update ${mockedRepository.name} from your Watchlist!!!`,
       });
     });
 
@@ -452,7 +454,6 @@ describe('GithubIneractionService', () => {
         roles: ['default'],
         repositories: [mockedRepository],
       };
-      const mockUsers: User[] = [mockUser];
       jest.spyOn(userRepostory, 'find').mockResolvedValue([mockUser]);
       const sendDataSpy = jest
         .spyOn(githubInteractionService, 'sendDataToAnotherApi')
@@ -466,8 +467,8 @@ describe('GithubIneractionService', () => {
       expect(sendDataSpy).toHaveBeenCalledWith({
         from: 'aleksandr.zolotarev@abstract.rs',
         to: mockUser.email,
-        subject: 'Here is update from your list!',
-        text: 'Hello there!!! Here is your update!',
+        subject: 'Here is your month summary',
+        text: `Hello, please, here is your monthly summary activity:\n\n- ${mockedRepository.name} `,
       });
     });
 
@@ -489,14 +490,26 @@ describe('GithubIneractionService', () => {
         text: 'Hello there!!! Here is your update!',
       };
 
-      const mockResponse = {data: 'Success'};
+      const mockResponse = { data: 'Success' };
 
-      jest.spyOn(httpService, 'post').mockReturnValue(of(mockResponse));
+      const axiosRes: AxiosResponse<unknown, any> = {
+        data: mockResponse,
+        status: 0,
+        statusText: '',
+        headers: undefined,
+        config: undefined,
+      };
 
-      const result = await githubInteractionService.sendDataToAnotherApi(mockData);
+      jest.spyOn(httpService, 'post').mockReturnValue(of(axiosRes));
 
-      expect(httpService.post).toHaveBeenCalledWith('http://localhost:3001/sendingTestingEmail/messageRequest', mockData);
-      expect(result).toBe('Success');
+      const result =
+        await githubInteractionService.sendDataToAnotherApi(mockData);
+
+      expect(httpService.post).toHaveBeenCalledWith(
+        'http://localhost:3001/sendingTestingEmail/messageRequest',
+        mockData,
+      );
+      expect(result).toEqual({ data: 'Success' });
     });
   });
 });

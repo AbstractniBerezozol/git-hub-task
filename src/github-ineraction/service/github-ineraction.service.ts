@@ -155,7 +155,7 @@ export class GithubIneractionService {
         const subject = 'Here is update from your list!';
         const text = `Hello, it is update ${repo.name} from your Watchlist!!!`;
         const letter = {
-          from: 'aleksander.zolotarev@abstract.rs',
+          from: 'aleksandr.zolotarev@abstract.rs',
           to: repo.user.email,
           subject: subject,
           text: text,
@@ -175,7 +175,7 @@ export class GithubIneractionService {
       const subject = 'Here is your month summary';
       const text = `Hello, please, here is your monthly summary activity:\n\n${summary}`;
       const letter = {
-        from: 'aleksander.zolotarev@abstract.rs',
+        from: 'aleksandr.zolotarev@abstract.rs',
         to: user.email,
         subject: subject,
         text: text,
