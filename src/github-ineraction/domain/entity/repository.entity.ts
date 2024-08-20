@@ -40,4 +40,5 @@ export class GitRepository {
 
   @ManyToOne(() => User, (user) => user.repositories)
   user: User;
+
 }

@@ -9,6 +9,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { User } from '../users/domain/entity/user.entity';
 import { UsersService } from '../users/service/users.service';
 import { AuthService } from './service/auth.service';
+import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 
 @Module({
   imports: [
@@ -25,6 +26,6 @@ import { AuthService } from './service/auth.service';
     TypeOrmModule.forFeature([User]),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, UsersService],
+  providers: [AuthService, JwtStrategy, UsersService, JwtRefreshStrategy],
 })
 export class AuthModule {}

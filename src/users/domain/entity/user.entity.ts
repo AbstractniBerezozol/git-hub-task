@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   Column,
+  DeleteDateColumn,
   Entity,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -24,6 +25,12 @@ export class User {
   email: string;
   @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
   roles: string[];
-  @OneToMany(() => GitRepository, (repository) => repository.user)
+  @Column({nullable: true})
+  refreshToken: string;
+  @OneToMany(() => GitRepository, (repository) => repository.user, {cascade: true})
   repositories: GitRepository[];
+  @DeleteDateColumn()
+  deletedDate: Date
+  @Column({default: false})
+  deleted:boolean
 }

@@ -14,6 +14,13 @@ export class UsersService {
     private readonly userRepository: Repository<User>,
   ) {}
 
+  async updateRefreshToken(
+    username: string,
+    refreshToken: string,
+  ): Promise<void> {
+    await this.userRepository.update(username, { refreshToken });
+  }
+
   async findAll() {
     const users = await this.userRepository.find({
       relations: { repositories: true },
@@ -76,6 +83,6 @@ export class UsersService {
 
   async remove(username: string) {
     const user = await this.findOne(username);
-    return this.userRepository.remove(user);
+    return this.userRepository.softRemove(user);
   }
 }
