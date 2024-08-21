@@ -72,18 +72,23 @@ export class UsersService {
     return this.userRepository.save(newUser);
   }
   async update(username: string, updateUserDto: UpdateUserDto) {
-    const user = await this.userRepository.preload({
-      username,
-      ...updateUserDto,
-    });
+    const user = await this.userRepository.findOne({where: {username}});
+    delete user.password
+    const updatedUser = {
+      ...user,
+      ...updateUserDto
+    }
     if (!user) {
       throw new NotFoundException(`User #${username} not found`);
     }
-    return this.userRepository.save(user);
+    await this.userRepository.save(updatedUser);
+    return updatedUser
   }
 
   async remove(username: string) {
     const user = await this.findOne(username);
-    return this.userRepository.softRemove(user);
+    delete user.password;
+    this.userRepository.softRemove(user);
+    return "You are deleted!"
   }
 }

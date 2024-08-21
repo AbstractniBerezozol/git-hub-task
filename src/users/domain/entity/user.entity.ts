@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { GitRepository } from '../../../github-ineraction/domain/entity/repository.entity';
 import { UserRole } from '../enum/roles.enum';
+import { Exclude, Expose } from 'class-transformer';
 
 @Entity()
 @Unique('unique_username', ['username'])
@@ -33,4 +34,5 @@ export class User {
   deletedDate: Date;
   @Column({ default: false })
   deleted: boolean;
+
 }
