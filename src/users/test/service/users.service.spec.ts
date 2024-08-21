@@ -15,6 +15,7 @@ describe('UsersService', () => {
     preload: jest.fn(),
     delete: jest.fn(),
     remove: jest.fn(),
+    softRemove: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -128,12 +129,12 @@ describe('UsersService', () => {
       repositories: [],
     } as User;
 
-    jest.spyOn(mockUserService, 'remove').mockReturnValue(user);
+    jest.spyOn(mockUserService, 'softRemove').mockReturnValue(user);
 
     const result = await service.remove(username);
 
     expect(result).toEqual(user);
 
-    expect(mockUserService.remove).toHaveBeenCalledWith(user);
+    expect(mockUserService.softRemove).toHaveBeenCalledWith(user);
   });
 });

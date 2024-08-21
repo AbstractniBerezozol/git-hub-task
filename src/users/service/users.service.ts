@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../domain/entity/user.entity';
 import { Repository } from 'typeorm';
@@ -14,13 +18,6 @@ export class UsersService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async updateRefreshToken(
-    username: string,
-    refreshToken: string,
-  ): Promise<void> {
-    await this.userRepository.update(username, { refreshToken });
-  }
-
   async findAll() {
     const users = await this.userRepository.find({
       relations: { repositories: true },
@@ -32,6 +29,10 @@ export class UsersService {
   }
 
   async findOne(username: string) {
+    if (!username) {
+      throw new Error('Username is null');
+    }
+
     const user = await this.userRepository.findOne({
       where: { username },
     });

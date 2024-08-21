@@ -123,6 +123,9 @@ describe('GithubIneractionService', () => {
         email: 'Coco@singimail.rs',
         roles: ['default'],
         repositories: [],
+        deletedDate: undefined,
+        deleted: false,
+        
       };
       const mockRepoId = 12345;
       const mockResponse = {
@@ -137,7 +140,7 @@ describe('GithubIneractionService', () => {
           watchers_count: 6,
           forks_count: 10509,
           latestRelease: 'v1.7.19',
-          // user: mockUser,
+         
         },
       };
 
@@ -162,6 +165,8 @@ describe('GithubIneractionService', () => {
         email: 'Coco@singimail.rs',
         roles: ['default'],
         repositories: [],
+        deletedDate: undefined,
+        deleted: false,
       };
       const mockRepoId = 12345;
       mockHttpService.get.mockReturnValue({
@@ -188,6 +193,8 @@ describe('GithubIneractionService', () => {
           email: 'Coco@singimail.rs',
           roles: ['default'],
           repositories: [],
+          deletedDate: undefined,
+          deleted: false,
         },
         name: '',
         full_name: '',
@@ -451,6 +458,8 @@ describe('GithubIneractionService', () => {
         email: 'Coco@singimail.rs',
         roles: ['default'],
         repositories: [mockedRepository],
+        deletedDate: undefined,
+        deleted: false,
       };
       jest.spyOn(userRepostory, 'find').mockResolvedValue([mockUser]);
       const sendDataSpy = jest

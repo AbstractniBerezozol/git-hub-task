@@ -25,12 +25,12 @@ export class User {
   email: string;
   @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
   roles: string[];
-  @Column({nullable: true})
-  refreshToken: string;
-  @OneToMany(() => GitRepository, (repository) => repository.user, {cascade: true})
+  @OneToMany(() => GitRepository, (repository) => repository.user, {
+    cascade: true,
+  })
   repositories: GitRepository[];
   @DeleteDateColumn()
-  deletedDate: Date
-  @Column({default: false})
-  deleted:boolean
+  deletedDate: Date;
+  @Column({ default: false })
+  deleted: boolean;
 }

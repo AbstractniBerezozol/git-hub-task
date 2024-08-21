@@ -23,6 +23,7 @@ export class AuthService {
     const { password: password2, ...result } = user;
     return {
       access_token: this.jwtservice.sign(result),
+      refresh_token: this.jwtservice.sign(result, { expiresIn: '15h' }),
     };
   }
 
@@ -33,7 +34,7 @@ export class AuthService {
   async generateRefreshToken(username: string): Promise<string> {
     const refreshTokenPayload = { sub: username };
     const refreshToken = this.jwtservice.sign(refreshTokenPayload, {
-      secret: process.env.JWT_REFRESH_SECRET,
+      secret: process.env.JWT_SECRET,
       expiresIn: '1h',
     });
     return refreshToken;
@@ -41,10 +42,13 @@ export class AuthService {
   async refreshToken(refreshToken: string): Promise<any> {
     try {
       const decoded = this.jwtservice.verify(refreshToken, {
-        secret: process.env.JWT_REFRESH_SECRET,
+        secret: process.env.JWT_SECRET,
       });
-      const user = await this.userService.findOne(decoded.sub);
-      if (!user || user.refreshToken !== refreshToken) {
+      console.log({ decoded });
+
+      const user = await this.userService.findOne(decoded.username);
+
+      if (!user) {
         throw new UnauthorizedException();
       }
 
@@ -52,13 +56,12 @@ export class AuthService {
       const newAccessToken = this.jwtservice.sign(payload);
       const newRefreshToken = await this.generateRefreshToken(user.username);
 
-      await this.userService.updateRefreshToken(user.username, newRefreshToken);
-
       return {
         accessToken: newAccessToken,
         refreshToken: newRefreshToken,
       };
     } catch (e) {
+      console.log({ e });
       throw new UnauthorizedException('Invalid refresh token');
     }
   }
