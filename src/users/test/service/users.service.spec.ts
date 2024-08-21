@@ -110,13 +110,18 @@ describe('UsersService', () => {
 
     const result = await service.update(username, updateUserDto);
 
-    expect(result).toEqual(user);
-
-    expect(mockUserService.preload).toHaveBeenCalledWith({
-      username,
+    expect(result).toEqual({
+      ...user,
       ...updateUserDto,
     });
-    expect(mockUserService.save).toHaveBeenCalledWith(user);
+
+    expect(mockUserService.findOne).toHaveBeenCalledWith({
+      where: {username}
+    });
+    expect(mockUserService.save).toHaveBeenCalledWith({
+      ...user,
+      ...updateUserDto,
+    });
   });
 
   it('remove => finds the user and delete it', async () => {
@@ -133,8 +138,11 @@ describe('UsersService', () => {
 
     const result = await service.remove(username);
 
-    expect(result).toEqual(user);
+    expect(result).toEqual('You are deleted!');
 
-    expect(mockUserService.softRemove).toHaveBeenCalledWith(user);
+    expect(mockUserService.softRemove).toHaveBeenCalledWith({
+      ...user,
+      password: undefined,
+    });
   });
 });
