@@ -1,18 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { GithubIneractionService } from '../../service/github-ineraction.service';
+import { SendingEmailService } from '../../service/sending-email.service';
 
 @Injectable()
 export class GitHubScheduler {
-  constructor(private readonly githubService: GithubIneractionService) {}
+  constructor(private readonly sendingEmailService: SendingEmailService) {}
 
   @Cron(CronExpression.EVERY_10_SECONDS)
   async handleCron() {
-    await this.githubService.checkForUpdates();
+    await this.sendingEmailService.checkForUpdates();
   }
 
   @Cron('0 0 1 * *')
   async handleMonthSummary() {
-    await this.githubService.sendMonthSummary();
+    await this.sendingEmailService.sendMonthSummary();
   }
 }

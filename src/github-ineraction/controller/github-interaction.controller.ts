@@ -16,12 +16,16 @@ import { SearchBy } from '../domain/enum/repository.enum';
 import { GithubIneractionService } from '../service/github-ineraction.service';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { UserRole } from '../../users/domain/enum/roles.enum';
+import { SendingEmailService } from '../service/sending-email.service';
 
 @UseGuards(LocalAuthGuard)
 @ApiTags('github-interaction')
 @Controller('github-interaction')
 export class GithubInteractionController {
-  constructor(private readonly githubService: GithubIneractionService) {}
+  constructor(
+    private readonly githubService: GithubIneractionService,
+    private readonly sendingEmailService: SendingEmailService,
+  ) {}
 
   @Get('search/repos/:value')
   async searchRepositories(
@@ -40,16 +44,16 @@ export class GithubInteractionController {
   }
 
   @UseGuards(RolesGuard)
-  @Get('sendTestEmail')
+  @Get('send-test-email')
   @Roles([UserRole.ADMIN, UserRole.MODERATOR])
   async sendEmail(@Query('email') email: string) {
     email = 'aleksandr.zolotarev@abstract.rs';
-    return this.githubService.sendMonthSummary();
+    return this.sendingEmailService.sendMonthSummary();
   }
 
-  @Post('sendDataToAnotherApi')
+  @Post('send-data-to-another-api')
   async sendToAnotherApiData() {
-    return this.githubService.checkForUpdates();
+    return this.sendingEmailService.checkForUpdates();
   }
 
   @Post('add-repository/:repoId')

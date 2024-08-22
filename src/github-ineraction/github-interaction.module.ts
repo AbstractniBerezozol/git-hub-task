@@ -8,6 +8,7 @@ import { GitRepository } from './domain/entity/repository.entity';
 import { GitHubScheduler } from './domain/scheduler/github-scheduler';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { SendingEmailService } from './service/sending-email.service';
 
 @Module({
   imports: [
@@ -23,6 +24,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     HttpModule,
   ],
   controllers: [GithubInteractionController],
-  providers: [GithubIneractionService, GitHubScheduler],
+  providers: [GithubIneractionService, GitHubScheduler, SendingEmailService],
 })
 export class GithubInteractionModule {}
