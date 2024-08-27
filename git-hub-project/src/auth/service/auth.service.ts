@@ -5,6 +5,7 @@ import { UsersService } from '../../users/service/users.service'
 import { AuthPayloadDto } from '../domain/dto/auth.dto'
 import { CreateUserDto } from '../../users/domain/dto/create-user.dto'
 import { SendingEmailService } from '../../github-ineraction/service/sending-email.service'
+import { nanoid } from 'nanoid'
 
 @Injectable()
 export class AuthService {
@@ -73,22 +74,14 @@ export class AuthService {
       throw new Error('User is not found')
     }
 
-    const newPassword = this.generateRandomPassword(12)
+    const newPassword = this.generateRandomPassword()
     const hashedPassword = await bcrypt.hash(newPassword, 10)
     await this.userService.update((user.password = hashedPassword))
-
-
 
     await this.sendingEmailService.sendNewPassword(user.email, newPassword)
   }
 
-  generateRandomPassword(length: number) {
-    const chars = 'abcdefghijklmnop'
-    let password = ''
-
-    for (let i = 0; i < length; i++) {
-      password += chars.charAt(Math.floor(Math.random() * chars.length))
-    }
-    return password
+  generateRandomPassword() {
+    return nanoid(12)
   }
 }
